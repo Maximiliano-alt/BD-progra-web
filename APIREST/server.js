@@ -10,18 +10,18 @@ app.use(express.json());
 // analizar las solicitudes de tipo de contenido - application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }));
 
-// en producción
-/*db.sequelize.sync()
-    .then(() => {
-        console.log("Synced db.");
-    })
-    .catch((err) => {
-        console.log("Failed to sync db: " + err.message);
-    });*/
-// en desarrollo
-db.sequelize.sync({ force: true }).then(() => {
-    console.log("Drop and re-sync db.");
-});
+//en producción
+db.sequelize.sync()
+  .then(() => {
+      console.log("Synced db.");
+  })
+  .catch((err) => {
+      console.log("Failed to sync db: " + err.message);
+  });
+//en desarrollo
+// db.sequelize.sync({ force: true }).then(() => {
+//     console.log("Drop and re-sync db.");
+// });
 
 require("./app/routes/client.routes")(app);
 

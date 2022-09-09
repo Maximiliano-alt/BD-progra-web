@@ -14,5 +14,5 @@ module.exports = app => {
     // eliminar todos los clientes
     router.delete("/", clients.deleteAll);
     // agregar rutas al servidor
-    app.use('/api/clients', router);
+    app.use('/api/client', router);
  };
