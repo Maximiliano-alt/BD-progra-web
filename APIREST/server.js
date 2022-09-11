@@ -22,6 +22,7 @@ db.sequelize.sync()
 // });
 
 require("./app/routes/client.routes")(app);
+require("./app/routes/user.routes")(app);
 
 // ruta simple
 app.get("/", (req, res) => {

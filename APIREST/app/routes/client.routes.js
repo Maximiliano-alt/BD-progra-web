@@ -4,15 +4,15 @@ module.exports = app => {
     // Crear un cliente
     router.post("/", client.create);
     // buscar clientes (con condición)
-    router.get("/", client.findAll);
+    //router.get("/", client.findAll);
     // buscar cliente con id
-    router.get("/:id", client.findOne);
+    //router.get("/:id", client.findOne);
     // actualizar cliente
-    router.put("/:id", client.update);
+    //router.put("/:id", client.update);
     // eliminar cliente con id
-    router.delete("/:id", client.delete);
+    //router.delete("/:id", client.delete);
     // eliminar todos los clientes
-    router.delete("/", client.deleteAll);
+    //outer.delete("/", client.deleteAll);
     // agregar rutas al servidor
     app.use('/api/client', router);
  };

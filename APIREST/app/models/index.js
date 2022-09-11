@@ -20,7 +20,7 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 // Importa modelos a Sequelize
-//db.client = require("./client.model.js")(sequelize, Sequelize);
 db.user   = require("./user.model.js")(sequelize, Sequelize);
+//db.client = require("./client.model.js")(sequelize, Sequelize);
 
 module.exports = db;
