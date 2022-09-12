@@ -18,6 +18,9 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
+
 // Importa modelos a Sequelize
-db.clients = require("./client.model.js")(sequelize, Sequelize); // tabla cliente
+db.user   = require("./user.model.js")(sequelize, Sequelize);
+//db.client = require("./client.model.js")(sequelize, Sequelize);
+
 module.exports = db;
