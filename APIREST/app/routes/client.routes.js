@@ -1,10 +1,8 @@
 module.exports = app => {
     const client = require("../controllers/client.controller.js");
     var router = require("express").Router();
-    // Crear un cliente
-    router.post("/add", client.create);
-    // buscar clientes (con condición)
-    //router.get("/", client.findAll);
+    router.post("/add", client.create); // Crear un cliente
+    router.get("/all", client.findAll); // buscar clientes (con condición)
     // buscar cliente con id
     //router.get("/:id", client.findOne);
     // actualizar cliente
@@ -15,4 +13,4 @@ module.exports = app => {
     //outer.delete("/", client.deleteAll);
     // agregar rutas al servidor
     app.use('/client', router);
- };
+};
