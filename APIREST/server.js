@@ -9,7 +9,7 @@ app.use(express.json()); // analizar las solicitudes de tipo de contenido - appl
 app.use(express.urlencoded({ extended: true })); // analizar las solicitudes de tipo de contenido - application/x-www-form-urlencoded
 
 // en producción
-db.sequelize.sync()
+db.sequelize.sync({alter: true})
   .then(() => {
       console.log("Synced db.");
   })
@@ -23,6 +23,7 @@ db.sequelize.sync()
 
 require("./app/routes/client.routes")(app);
 require("./app/routes/user.routes")(app);
+require("./app/routes/provider.routes")(app);
 
 // ruta simple
 app.get("/", (req, res) => {

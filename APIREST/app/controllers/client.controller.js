@@ -1,18 +1,18 @@
 // Importar dependencias
-const db = require("../models");
-const Client = db.clients;
-const Op = db.Sequelize.Op;
+const db     = require("../models");
+const Client = db.client;
+const Op     = db.Sequelize.Op;
 
 // Crear un nuevo cliente
 exports.create = (req, res) => {
     // Validar consulta
-    if (!req.body.id || !req.body.rut) {
+    if (!req.body.rut) {
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
     // Create a Cliente
     const client = {
-        id: req.body.id,
+        id: req.body.id_client,
         rut: req.body.rut
     };
     // Guardar en base de datos
@@ -25,19 +25,18 @@ exports.create = (req, res) => {
     });
 };
 
-// Retornar los clientes de la base de datos.
-// exports.findAll = (req, res) => {
-//     const name = req.query.name;
-//     var condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
-//     Client.findAll({ where: condition }) // busca las tuplas que coincida con la codición
-//     .then(data => {
-//         res.send(data);
-//     })
-//     .catch(err => {
-//         res.status(500).send({ message: err.message || "Error en la búsqueda"});
-//     });
-     
-// };
+//Retornar los clientes de la base de datos.
+exports.findAll = (req, res) => {
+    const id = req.query.id_client;
+    var condition = id ? { id: { [Op.like]: `%${id}%` } } : null;
+    Client.findAll({ where: condition }) // busca las tuplas que coincida con la codición
+    .then(data => {
+        res.send(data);
+    })
+    .catch(err => {
+        res.status(500).send({ message: err.message || "Error en la búsqueda"});
+    });  
+};
 
 // // Buscar un cliente por su id
 // exports.findOne = (req, res) => {
