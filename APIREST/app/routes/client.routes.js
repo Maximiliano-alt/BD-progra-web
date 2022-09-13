@@ -1,6 +1,6 @@
 module.exports = app => {
     const client = require("../controllers/client.controller.js");
-    var router = require("express").Router();
+    var router   = require("express").Router();
     router.post("/add", client.create); // Crear un cliente
     router.get("/all", client.findAll); // buscar clientes (con condición)
     // buscar cliente con id

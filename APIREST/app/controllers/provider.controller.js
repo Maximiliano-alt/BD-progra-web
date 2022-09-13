@@ -2,14 +2,14 @@ const db       = require("../models");
 const Provider = db.provider;
 const Op       = db.Sequelize.Op;
 
-// Crear un nuevo cliente
+// Crear un nuevo proveedor
 exports.create = (req, res) => {
     // Validar consulta
     if (!req.body.rut) {
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
-    // Create a Cliente
+    // Create a proveedor
     const provider = {
         id: req.body.id_client,
         rut: req.body.rut
