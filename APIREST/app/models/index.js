@@ -1,5 +1,5 @@
 // Importe de dependencias
-const dbConfig = require("../config/db.config.js"); // prop de la bd
+const dbConfig  = require("../config/db.config.js"); // prop de la bd
 const Sequelize = require("sequelize");
 
 // Inicialización de Sequelize
@@ -20,7 +20,8 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 // Importa modelos a Sequelize
-db.user   = require("./user.model.js")(sequelize, Sequelize);
-db.client = require("./client.model.js")(sequelize, Sequelize);
+db.user     = require("./user.model.js")(sequelize, Sequelize);
+db.client   = require("./client.model.js")(sequelize, Sequelize);
+db.provider = require("./provider.model.js")(sequelize, Sequelize);
 
 module.exports = db;

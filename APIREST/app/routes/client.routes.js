@@ -10,7 +10,7 @@ module.exports = app => {
     // eliminar cliente con id
     //router.delete("/:id", client.delete);
     // eliminar todos los clientes
-    //outer.delete("/", client.deleteAll);
+    //router.delete("/", client.deleteAll);
     // agregar rutas al servidor
     app.use('/client', router);
 };

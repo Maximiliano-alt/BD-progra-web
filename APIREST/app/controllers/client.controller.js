@@ -1,7 +1,7 @@
 // Importar dependencias
-const db = require("../models");
+const db     = require("../models");
 const Client = db.client;
-const Op = db.Sequelize.Op;
+const Op     = db.Sequelize.Op;
 
 // Crear un nuevo cliente
 exports.create = (req, res) => {

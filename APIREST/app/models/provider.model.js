@@ -8,7 +8,7 @@ module.exports = (sequelize, Sequelize) => {
                 key: 'rut',  // This is the column name of the referenced model
             }
         }},
-        { 
+        {
             hooks : {
                 beforeCreate : (provider, options) => {
                     // provider.dataValues.createdAt = new Date().toISOString().replace(/T/, ' ').replace(/\..+/g, '');

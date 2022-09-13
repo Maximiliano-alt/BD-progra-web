@@ -25,7 +25,7 @@ exports.create = (req, res) => {
         res.send(data);
     })
     .catch(err => {     // error 500: 
-        res.status(500).send({ message: err.message || "Error al crear un nuevo cliente"});
+        res.status(500).send({ message: err.message || "Error al crear un nuevo usuario"});
     });
 };
 
