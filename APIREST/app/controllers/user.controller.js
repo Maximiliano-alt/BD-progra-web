@@ -6,7 +6,7 @@ const Op = db.Sequelize.Op;
 // Crear un nuevo usuario
 exports.create = (req, res) => {
     // Validar consulta
-    if (!req.body.first_name || !req.body.last_name || !req.body.rut || !req.body.direction || !req.body.mail || !req.body.password) {
+    if (!req.body.first_name && !req.body.last_name && !req.body.rut && !req.body.direction && !req.body.mail && !req.body.password) {
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
@@ -31,7 +31,9 @@ exports.create = (req, res) => {
 
 // Retornar los usuarios de la base de datos.
 exports.findAll = (req, res) => {
+
     const first_name = req.query.first_name;
+    
     var condition = first_name ? { first_name: { [Op.like]: `%${first_name}%` } } : null;
     User.findAll({ where: condition }) // busca las tuplas que coincida con la codición
     .then(data => {
@@ -41,3 +43,15 @@ exports.findAll = (req, res) => {
         res.status(500).send({ message: err.message || "Error en la búsqueda"});
     });
 }
+
+exports.delete = (req, res) => {
+    const id = req.params.rut;
+    User.destroy({where: { rut: id }})
+    .then(num => {
+       res.send(num ? { message: "User eliminado" } : { message: `User no encontrado`});
+        
+    })
+    .catch(err => {
+        res.status(500).send({ message: "Error al eliminar usuario"});
+    });
+};

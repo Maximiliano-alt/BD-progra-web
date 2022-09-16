@@ -7,10 +7,9 @@ module.exports = app => {
     //router.get("/:id", user.findOne);
     // actualizar user
     //router.put("/:id", user.update);
-    // eliminar user con id
-    //router.delete("/:id", user.delete);
+    router.delete("/:rut", user.delete); // eliminar user con id=rut
     // eliminar todos los users
-    //outer.delete("/", user.deleteAll);
+    //router.delete("/", user.deleteAll);
     // agregar rutas al servidor
     app.use('/user', router);
  };

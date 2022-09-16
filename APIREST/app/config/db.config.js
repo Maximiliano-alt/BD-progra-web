@@ -1,7 +1,7 @@
 module.exports = {
     HOST: "localhost",
     USER: "root",
-    PASSWORD: "Max153023158",
+    PASSWORD: "zomani.-",
     DB: "electronicECOM",
     dialect: "mysql",
     pool: {

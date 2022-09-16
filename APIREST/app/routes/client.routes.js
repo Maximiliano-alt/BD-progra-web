@@ -7,8 +7,7 @@ module.exports = app => {
     //router.get("/:id", client.findOne);
     // actualizar cliente
     //router.put("/:id", client.update);
-    // eliminar cliente con id
-    //router.delete("/:id", client.delete);
+    //router.delete("/:id", client.delete); // eliminar cliente con id
     // eliminar todos los clientes
     //router.delete("/", client.deleteAll);
     // agregar rutas al servidor
