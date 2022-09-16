@@ -6,22 +6,21 @@ const associateUser = () => {
   // ususraio puede ser un proovedor
   db.user.hasOne(db.provider, {
     foreignKey: {
-       name: 'rut',
-       type: Sequelize.STRING(15),
-       allowNull: false,
+      name: 'rut',
+      type: Sequelize.STRING(15),
+      allowNull: false
     }
   },{
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   }); // una categoria tiene muchos productos
-  //db.provider.belongsTo(db.user); // la clave primaria de categoria pasa foranea a productos
   
   // o un usuario puede ser un cliente
   db.user.hasOne(db.client, {
     foreignKey: {
-       name: 'rut',
-       type: Sequelize.STRING(15),
-       allowNull: false,
+      name: 'rut',
+      type: Sequelize.STRING(15),
+      allowNull: false,
     }
   },{
     onDelete: 'CASCADE',
@@ -51,6 +50,8 @@ db.user     = require("./user.model.js")(sequelize, Sequelize);
 db.client   = require("./client.model.js")(sequelize, Sequelize);
 db.provider = require("./provider.model.js")(sequelize, Sequelize);
 associateUser();
+
+db.cart     = require("./cart.model.js")(sequelize, Sequelize);
 
 
 module.exports = db;

@@ -4,7 +4,8 @@ const User = db.user;
 const Op = db.Sequelize.Op;
 
 // Crear un nuevo usuario
-exports.create = (req, res) => {
+exports.create = (req, res) => 
+{
     // Validar consulta
     if (!req.body.first_name && !req.body.last_name && !req.body.rut && !req.body.direction && !req.body.mail && !req.body.password) {
         res.status(400).send({ message: "Content can not be empty!" });
@@ -30,8 +31,8 @@ exports.create = (req, res) => {
 };
 
 // Retornar los usuarios de la base de datos.
-exports.findAll = (req, res) => {
-
+exports.findAll = (req, res) => 
+{
     const first_name = req.query.first_name;
     
     var condition = first_name ? { first_name: { [Op.like]: `%${first_name}%` } } : null;
@@ -44,7 +45,40 @@ exports.findAll = (req, res) => {
     });
 }
 
-exports.delete = (req, res) => {
+// Buscar un usuario por su id
+exports.findOne = (req, res) => {
+    const id = req.params.rut;
+
+    User.findByPk(id) // busacar por id
+    .then(data => {
+        if (data) res.send(data); // existe el dato? entrega la data
+        else      res.status(404).send({ message: `No se encontró al usuario.`});
+    })
+    .catch(err => {
+        res.status(500).send({ message: "Error en la búsqueda"});
+    });
+     
+};
+
+// actualizar un usuario por su id
+exports.update = (req, res) => {
+    const id = req.params.rut;
+
+    Client.update(req.body, {  where: { rut: id }})
+    .then(num => {
+        if (num == 1) res.send({ message: "Usuario actualizado."});
+        else          res.send({ message: `No se pudo actualizar al usuario`});
+        
+    })
+    .catch(err => {
+        res.status(500).send({ message: "Error en actualización"});
+    });
+     
+};
+
+// eliminar un cliente
+exports.delete = (req, res) => 
+{
     const id = req.params.rut;
     User.destroy({where: { rut: id }})
     .then(num => {
@@ -54,4 +88,17 @@ exports.delete = (req, res) => {
     .catch(err => {
         res.status(500).send({ message: "Error al eliminar usuario"});
     });
+};
+
+// eliminar a todos los usuarios
+exports.deleteAll = (req, res) => {
+
+    User.destroy({ where: {}, truncate: false })
+    .then(nums => {
+        res.send({ message: `${nums} usuarios eliminados!` });
+    })
+    .catch(err => {
+        res.status(500).send({ message: err.message || "Error al eliminar a todos los usuarios." });
+    });
+    
 };
