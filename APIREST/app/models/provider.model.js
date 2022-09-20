@@ -1,13 +1,8 @@
 module.exports = (sequelize, Sequelize) => {
     const Provider = sequelize.define("providers", {
 
-        id_provider: { type: Sequelize.INTEGER, allowNull: false, autoIncrement: true, primaryKey:true },
-        rut:         { type: Sequelize.STRING(15),  allowNull: false, 
-            references: {
-                model: 'users', // This is a reference to another model
-                key: 'rut',  // This is the column name of the referenced model
-            }
-        }},
+        id_provider: { type: Sequelize.INTEGER, allowNull: false, autoIncrement: true, primaryKey:true }
+        },
         {
             hooks : {
                 beforeCreate : (provider, options) => {
@@ -23,3 +18,9 @@ module.exports = (sequelize, Sequelize) => {
     return Provider;
 }
 
+// rut:         { type: Sequelize.STRING(15),  allowNull: false, 
+//     references: {
+//         model: 'users', // This is a reference to another model
+//         key: 'rut',  // This is the column name of the referenced model
+//     }
+// }
