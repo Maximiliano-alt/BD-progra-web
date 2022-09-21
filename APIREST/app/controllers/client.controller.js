@@ -13,7 +13,6 @@ exports.create = (req, res) =>
     }
     // Create a Cliente
     const client = {
-        id: req.body.id,
         rut: req.body.rut
     };
     // Guardar en base de datos

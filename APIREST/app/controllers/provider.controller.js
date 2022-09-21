@@ -11,7 +11,6 @@ exports.create = (req, res) => {
     }
     // Create a proveedor
     const provider = {
-        id: req.body.id_provider,
         rut: req.body.rut
     };
     // Guardar en base de datos
