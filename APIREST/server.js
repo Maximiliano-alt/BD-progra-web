@@ -24,11 +24,12 @@ db.sequelize.sync({alter: true})
 require("./app/routes/user.routes")(app);
 require("./app/routes/client.routes")(app);
 require("./app/routes/provider.routes")(app);
+require("./app/routes/buy.routes")(app);
 require("./app/routes/cart.routes")(app);
 
 // ruta simple
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to bezkoder application." });
+  res.json({ message: "Welcome to electonicECOM page." });
 });
 
 // Configurar puertos
