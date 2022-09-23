@@ -2,7 +2,8 @@
 const dbConfig  = require("../config/db.config.js"); // prop de la bd
 const Sequelize = require("sequelize");
 
-const associateUser = () => {
+const associateUser = () => 
+{
   // ususraio puede ser un proovedor
   db.user.hasOne(db.provider, {
     foreignKey: {
@@ -24,6 +25,30 @@ const associateUser = () => {
     }
   },{
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  });
+}
+
+// una compra referencia a un cliente y a un carro con productos
+const associateBuy = () => 
+{
+  db.client.belongsToMany(db.cart, { through: db.buy,
+    foreignKey: {
+      name: 'id_client',
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+    onDelete: 'RESTRICT',
+    onUpdate: 'CASCADE'
+  });
+
+  db.cart.belongsToMany(db.client, { through: db.buy,
+    foreignKey: {
+      name: 'id_cart',
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+    onDelete: 'RESTRICT',
     onUpdate: 'CASCADE'
   });
 }
@@ -51,7 +76,9 @@ db.client   = require("./client.model.js")(sequelize, Sequelize);
 db.provider = require("./provider.model.js")(sequelize, Sequelize);
 associateUser();
 
+db.buy      = require("./buy.model.js")(sequelize, Sequelize);
 db.cart     = require("./cart.model.js")(sequelize, Sequelize);
+associateBuy();
 
 
 module.exports = db;
