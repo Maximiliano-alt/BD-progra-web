@@ -38,7 +38,7 @@ const associateBuy = () =>
       type: Sequelize.INTEGER,
       allowNull: false,
     },
-    onDelete: 'RESTRICT',
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   });
 
@@ -48,7 +48,7 @@ const associateBuy = () =>
       type: Sequelize.INTEGER,
       allowNull: false,
     },
-    onDelete: 'RESTRICT',
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   });
 }
