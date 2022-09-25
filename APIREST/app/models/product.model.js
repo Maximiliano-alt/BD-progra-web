@@ -1,4 +1,4 @@
-module.export = (sequelize, Sequelize) =>
+module.exports = (sequelize, Sequelize) =>
 {
     const Product = sequelize.define("products", {
         id_product:     { type: Sequelize.INTEGER, allowNull: false, autoIncrement: true, primaryKey:true },

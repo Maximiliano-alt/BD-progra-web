@@ -4,17 +4,16 @@ const Sequelize = require("sequelize");
 
 const associateUser = () => 
 {
-  // ususraio puede ser un proovedor
+  // usuario puede ser un proovedor
   db.user.hasOne(db.provider, {
     foreignKey: {
       name: 'rut',
       type: Sequelize.STRING(15),
       allowNull: false
-    }
-  },{
+    },
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
-  }); // una categoria tiene muchos productos
+  });
   
   // o un usuario puede ser un cliente
   db.user.hasOne(db.client, {
@@ -22,8 +21,7 @@ const associateUser = () =>
       name: 'rut',
       type: Sequelize.STRING(15),
       allowNull: false,
-    }
-  },{
+    },
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   });
@@ -53,6 +51,20 @@ const associateBuy = () =>
   });
 }
 
+// un producto es referenciado por un proveedor
+const associateProduct = () =>
+{
+  db.provider.hasMany(db.product, {
+    foreignKey: {
+      name: 'id_provider',
+      type: Sequelize.INTEGER,
+      allowNull: true,
+    },
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  });
+}
+
 // Inicialización de Sequelize
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
@@ -75,6 +87,9 @@ db.user     = require("./user.model.js")(sequelize, Sequelize);
 db.client   = require("./client.model.js")(sequelize, Sequelize);
 db.provider = require("./provider.model.js")(sequelize, Sequelize);
 associateUser();
+
+db.product  = require("./product.model.js")(sequelize, Sequelize);
+associateProduct();
 
 db.buy      = require("./buy.model.js")(sequelize, Sequelize);
 db.cart     = require("./cart.model.js")(sequelize, Sequelize);
