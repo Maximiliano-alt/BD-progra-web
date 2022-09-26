@@ -39,4 +39,63 @@ exports.findAll = (req, res) =>
     });
 };
 
-exports.deleteById
+// Buscar un carro por su id
+exports.findOne = (req, res) => 
+{
+    const id = req.params.id_cart;
+    Cart.findByPk(id) // buscar por id
+
+    .then(data => {
+        if (data) res.send(data); // existe el dato? entrega la data
+        else      res.status(404).send({ message: `No se encontró el carro.`});
+    })
+    .catch(err => {
+        res.status(500).send({ message: "Error en la búsqueda"});
+    });
+     
+};
+
+// actualizar un carro por su id
+exports.update = (req, res) => 
+{
+    const id = req.params.id_cart;
+    Cart.update(req.body, {  where: { id_cart: id }})
+
+    .then(num => {
+        if (num == 1) res.send({ message: "Carro actualizada."});
+        else          res.send({ message: `No se pudo actualizar el carro`});
+        
+    })
+    .catch(err => {
+        res.status(500).send({ message: "Error en actualización"});
+    });
+     
+};
+
+// eliminar un carro
+exports.delete = (req, res) => 
+{
+    const id = req.params.id_cart;
+    Cart.destroy({where: { id_cart: id }})
+
+    .then(num => {
+        if (num == 1) res.send({ message: "Carro eliminada" });
+        else          res.send({ message: `Carro no encontrado`});
+    })
+    .catch(err => {
+        res.status(500).send({ message: "Error al eliminar carro"});
+    });
+};
+
+// eliminar todos los carros
+exports.deleteAll = (req, res) => 
+{
+    Cart.destroy({ where: {}, truncate: false })
+    .then(nums => {
+        res.send({ message: `${nums} Carros eliminados!` });
+    })
+    .catch(err => {
+        res.status(500).send({ message: err.message || "Error al eliminar todos los carros." });
+    });
+    
+};
