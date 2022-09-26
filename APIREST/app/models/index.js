@@ -58,7 +58,31 @@ const associateProduct = () =>
     foreignKey: {
       name: 'id_provider',
       type: Sequelize.INTEGER,
-      allowNull: true,
+      allowNull: false,
+    },
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  });
+}
+
+// producto/s comprado/s pertenece a un carro y hace referencia a producto/s
+const associatePurchased = () =>
+{
+  db.cart.hasMany(db.purchasedProduct, {
+    foreignKey: {
+      name: 'id_cart',
+      type: Sequelize.INTEGER,
+      allowNull: false,
+    },
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE'
+  });
+
+  db.product.hasOne(db.purchasedProduct, {
+    foreignKey: {
+      name: 'id_product',
+      type: Sequelize.INTEGER,
+      allowNull: false
     },
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
@@ -95,5 +119,7 @@ db.buy      = require("./buy.model.js")(sequelize, Sequelize);
 db.cart     = require("./cart.model.js")(sequelize, Sequelize);
 associateBuy();
 
+db.purchasedProduct = require("./purchasedProduct.model.js")(sequelize, Sequelize);
+associatePurchased();
 
 module.exports = db;
