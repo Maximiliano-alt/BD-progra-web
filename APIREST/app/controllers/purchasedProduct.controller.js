@@ -6,13 +6,15 @@ const Op        = db.Sequelize.Op;
 exports.create = (req, res) => 
 {
     // Validar consulta
-    if (!req.body.units) {
+    if (!req.body.id_product && !req.body.id_cart && !req.body.units) {
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
     // Create a purchased product
     const purchased = {
-        units: req.body.units
+        id_cart: req.body.id_cart,
+        id_product: req.body.id_product,
+        units: req.body.units,
     };
     // Guardar en base de datos
     Purchased.create(purchased) // okey? entonces devuelve la data
