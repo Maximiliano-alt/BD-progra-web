@@ -6,13 +6,15 @@ const Op        = db.Sequelize.Op;
 exports.create = (req, res) => 
 {
     // Validar consulta
-    if (!req.body.units) {
+    if (!req.body.id_product && !req.body.id_cart && !req.body.units) {
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
     // Create a purchased product
     const purchased = {
-        units: req.body.units
+        id_cart: req.body.id_cart,
+        id_product: req.body.id_product,
+        units: req.body.units,
     };
     // Guardar en base de datos
     Purchased.create(purchased) // okey? entonces devuelve la data
@@ -38,38 +40,38 @@ exports.findAll = (req, res) =>
     });
 };
 
-// Buscar producto/s comprado/s por su id carro
-exports.findOne = (req, res) => 
-{
-    const id = req.params.id_cart;
-    Purchased.findByPk(id) // buscar por id
+// // Buscar producto/s comprado/s por su id carro
+// exports.findOne = (req, res) => 
+// {
+//     const id = req.params.id_cart;
+//     Purchased.findByPk(id) // buscar por id
 
-    .then(data => {
-        if (data) res.send(data); // existe el dato? entrega la data
-        else      res.status(404).send({ message: `No se encontró el/los producto/s comprado/s.`});
-    })
-    .catch(err => {
-        res.status(500).send({ message: "Error en la búsqueda"});
-    });
+//     .then(data => {
+//         if (data) res.send(data); // existe el dato? entrega la data
+//         else      res.status(404).send({ message: `No se encontró el/los producto/s comprado/s.`});
+//     })
+//     .catch(err => {
+//         res.status(500).send({ message: "Error en la búsqueda"});
+//     });
      
-};
+// };
 
-// actualizar un producto comprado por su id
-exports.update = (req, res) => 
-{
-    const id = req.params.id_cart;
-    Purchased.update(req.body, {  where: { id_cart: id }})
+// // actualizar un producto comprado por su id
+// exports.update = (req, res) => 
+// {
+//     const id = req.params.id_cart;
+//     Purchased.update(req.body, {  where: { id_cart: id }})
 
-    .then(num => {
-        if (num == 1) res.send({ message: "Producto comprado actualizada."});
-        else          res.send({ message: `No se pudo actualizar el producto comprado`});
+//     .then(num => {
+//         if (num == 1) res.send({ message: "Producto comprado actualizada."});
+//         else          res.send({ message: `No se pudo actualizar el producto comprado`});
         
-    })
-    .catch(err => {
-        res.status(500).send({ message: "Error en actualización"});
-    });
+//     })
+//     .catch(err => {
+//         res.status(500).send({ message: "Error en actualización"});
+//     });
      
-};
+// };
 
 // eliminar un producto comprado
 exports.delete = (req, res) => 
@@ -78,11 +80,11 @@ exports.delete = (req, res) =>
     Purchased.destroy({where: { id_cart: id }})
 
     .then(num => {
-        if (num == 1) res.send({ message: "Producto comprado eliminada" });
-        else          res.send({ message: `Producto comprado no encontrado`});
+        if (num == 1) res.send({ message: "Producto/s comprado/s eliminado/s" });
+        else          res.send({ message: `Producto/s comprado/s no encontrado/s`});
     })
     .catch(err => {
-        res.status(500).send({ message: "Error al eliminar producto comprado"});
+        res.status(500).send({ message: "Error al eliminar producto/s comprado/s"});
     });
 };
 
