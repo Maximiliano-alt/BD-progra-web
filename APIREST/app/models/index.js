@@ -8,7 +8,12 @@ const associateUser = () =>
   db.user.hasOne(db.provider, {
     foreignKey: {
       name: 'rut',
-      type: Sequelize.STRING(15),
+      allowNull: false
+    }
+  });
+  db.provider.belongsTo(db.user, {
+    foreignKey: {
+      name: 'rut',
       allowNull: false
     },
     onDelete: 'CASCADE',
@@ -19,8 +24,13 @@ const associateUser = () =>
   db.user.hasOne(db.client, {
     foreignKey: {
       name: 'rut',
-      type: Sequelize.STRING(15),
-      allowNull: false,
+      allowNull: false
+    }
+  });
+  db.client.belongsTo(db.user, {
+    foreignKey: {
+      name: 'rut',
+      allowNull: false
     },
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
@@ -30,21 +40,20 @@ const associateUser = () =>
 // una compra referencia a un cliente y a un carro con productos
 const associateBuy = () => 
 {
-  db.client.belongsToMany(db.cart, { through: db.buy,
+  db.cart.belongsToMany(db.client, { through: db.buy, unique: false,
     foreignKey: {
-      name: 'id_client',
+      name: 'id_cart',
       type: Sequelize.INTEGER,
-      allowNull: false,
+      allowNull: false
     },
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   });
-
-  db.cart.belongsToMany(db.client, { through: db.buy,
+  db.client.belongsToMany(db.cart, { through: db.buy, unique: false,
     foreignKey: {
-      name: 'id_cart',
+      name: 'id_client',
       type: Sequelize.INTEGER,
-      allowNull: false,
+      allowNull: false
     },
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
@@ -57,7 +66,12 @@ const associateProduct = () =>
   db.provider.hasMany(db.product, {
     foreignKey: {
       name: 'id_provider',
-      type: Sequelize.INTEGER,
+      allowNull: false
+    }
+  });
+  db.product.belongsTo(db.provider, {
+    foreignKey: {
+      name: 'id_provider',
       allowNull: false,
     },
     onDelete: 'CASCADE',
@@ -68,17 +82,30 @@ const associateProduct = () =>
 // producto/s comprado/s pertenece a un carro y hace referencia a producto/s
 const associatePurchased = () =>
 {
+  // producto/s comprado/a asosciado/s a un carro
   db.cart.hasMany(db.purchasedProduct, {
     foreignKey: {
       name: 'id_cart',
-      type: Sequelize.INTEGER,
-      allowNull: false,
+      allowNull: false
+    }
+  });
+  db.purchasedProduct.belongsTo(db.cart, {
+    foreignKey: {
+      name: 'id_cart',
+      allowNull: false
     },
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   });
 
+  // un producto comprado es un producto o se refiere a un producto
   db.product.hasOne(db.purchasedProduct, {
+    foreignKey: {
+      name: 'id_product',
+      allowNull: false
+    }
+  });
+  db.purchasedProduct.belongsTo(db.product, {
     foreignKey: {
       name: 'id_product',
       type: Sequelize.INTEGER,
@@ -86,7 +113,7 @@ const associatePurchased = () =>
     },
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
-  });
+  })
 }
 
 // Inicialización de Sequelize

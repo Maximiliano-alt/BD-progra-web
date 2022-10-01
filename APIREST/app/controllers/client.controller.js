@@ -28,20 +28,37 @@ exports.create = (req, res) =>
 // Retornar los clientes de la base de datos.
 exports.findAll = (req, res) => 
 {
-    const name = req.query?.id_client;
-    var condition = name ? { name: { [Op.like]: `%${name}%` } } : null;
+    const { id } = req.query; //...../all ? id = 1
+    let condition = id ? { id_client: { [Op.like]: `%${id}%` } } : null;
+
     Client.findAll({ where: condition }) // busca las tuplas que coincida con la codición
+    .then(data => {
+        res.send(data);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).send({ message: err.message || "Error en la búsqueda"});
+    });
+};
+
+// busca el correo y rut de todos los clientes
+exports.findNameMail = (req, res) =>
+{
+    const id = req.query?.id_client;
+    var condition = id ? { id: { [Op.like]: `%${id}%` } } : null;
+
+    Client.findAll({include: [{ model: db.user, attributes: ["first_name","last_name","mail"]}], where: condition, attributes: { exclude: ["id_client", "rut", "createdAt", "updatedAt"]}}) // busca las tuplas que coincida con la codición
     .then(data => {
         res.send(data);
     })
     .catch(err => {
         res.status(500).send({ message: err.message || "Error en la búsqueda"});
     });
-     
-};
+}
 
 // Buscar un cliente por su id
-exports.findOne = (req, res) => {
+exports.findOne = (req, res) => 
+{
     const id = req.params.id_client;
 
     Client.findByPk(id) // busacar por id
