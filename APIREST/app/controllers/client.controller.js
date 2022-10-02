@@ -25,10 +25,10 @@ exports.create = (req, res) =>
     });
 };
 
-// Retornar los clientes de la base de datos.
+// Retornar los clientes de la base de datos o con id especificado.
 exports.findAll = (req, res) => 
 {
-    const { id } = req.query; //...../all ? id = 1
+    const { id }  = req.query; //...../all ? id = 1
     let condition = id ? { id_client: { [Op.like]: `%${id}%` } } : null;
 
     Client.findAll({ where: condition }) // busca las tuplas que coincida con la codición
@@ -41,13 +41,20 @@ exports.findAll = (req, res) =>
     });
 };
 
-// busca el correo y rut de todos los clientes
+// busca el correo y rut de todos los clientes o con id especificado
 exports.findNameMail = (req, res) =>
 {
-    const id = req.query?.id_client;
-    var condition = id ? { id: { [Op.like]: `%${id}%` } } : null;
+    const {id}    = req.query;
+    var condition = id ? { id_client: { [Op.like]: `%${id}%` } } : null;
 
-    Client.findAll({include: [{ model: db.user, attributes: ["first_name","last_name","mail"]}], where: condition, attributes: { exclude: ["id_client", "rut", "createdAt", "updatedAt"]}}) // busca las tuplas que coincida con la codición
+    Client.findAll({ 
+        include: [{ 
+            model: db.user, 
+            attributes: ["first_name","last_name","mail"]
+        }], 
+        where: condition,  // busca las tuplas que coincida con la codición
+        attributes: { exclude: ["id_client", "rut", "createdAt", "updatedAt"]} // para atributos que no se necesitan recoger
+    })
     .then(data => {
         res.send(data);
     })
@@ -69,11 +76,42 @@ exports.findOne = (req, res) =>
     .catch(err => {
         res.status(500).send({ message: "Error en la búsqueda"});
     });
-     
 };
 
+exports.allBuysById = (req, res) =>
+{
+    const id      = req.params?.id_client;
+    var condition = id ? { id_client: id } : null;
+
+    Client.findAll({ 
+        include: [{
+            model: db.cart,
+            through: { attributes: [] }, //through: { attributes: [] }: para no obtener atributos de la tabla de union entre cliente y carro
+            attributes: ["id_cart"],
+            include: [{
+                model: db.purchasedProduct,
+                attributes: ["units"],
+                include: [{
+                    model: db.product,
+                    attributes: ["name_product", "price"]
+                }],
+            }],
+        }],
+        where: condition,
+        attributes: { exclude: ["id_client", "rut", "createdAt", "updatedAt"]}
+    })
+    .then(data => {
+        res.send(data);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).send({ message: err.message || "Error en la búsqueda"});
+    });
+}
+
 // actualizar un cliente por su id
-exports.update = (req, res) => {
+exports.update = (req, res) => 
+{
     const id = req.params.id_client;
 
     Client.update(req.body, {  where: { id_client: id }})
@@ -84,12 +122,12 @@ exports.update = (req, res) => {
     })
     .catch(err => {
         res.status(500).send({ message: "Error en actualización"});
-    });
-     
+    });   
 };
 
 // eliminar un cliente
-exports.delete = (req, res) => {
+exports.delete = (req, res) => 
+{
     const id = req.params.id_client;
 
     Client.destroy({where: { id_client: id }})
@@ -104,8 +142,8 @@ exports.delete = (req, res) => {
 };
 
 // eliminar a todos los clientes
-exports.deleteAll = (req, res) => {
-
+exports.deleteAll = (req, res) => 
+{
     Client.destroy({ where: {}, truncate: false })
     .then(nums => {
         res.send({ message: `${nums} clientes eliminados!` });
@@ -113,5 +151,4 @@ exports.deleteAll = (req, res) => {
     .catch(err => {
         res.status(500).send({ message: err.message || "Error al eliminar a todos los clientes." });
     });
-    
 };

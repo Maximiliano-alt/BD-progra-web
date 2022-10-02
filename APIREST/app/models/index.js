@@ -30,7 +30,7 @@ const associateUser = () =>
 // una compra referencia a un cliente y a un carro con productos
 const associateBuy = () => 
 {
-  db.client.belongsToMany(db.cart, { through: db.buy, unique: false,
+  db.client.belongsToMany(db.cart, { through: db.buy,
     foreignKey: {
       name: 'id_client',
       allowNull: true
@@ -39,7 +39,7 @@ const associateBuy = () =>
     onUpdate: 'CASCADE'
   });
 
-  db.cart.belongsToMany(db.client, { through: db.buy, unique: false,
+  db.cart.belongsToMany(db.client, { through: db.buy,
     foreignKey: {
       name: 'id_cart',
       allowNull: true
