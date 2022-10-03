@@ -93,7 +93,8 @@ exports.findAllBuysById = (req, res) =>
                 attributes: ["units"],
                 include: [{
                     model: db.product,
-                    attributes: ["name_product", "price"]
+                    attributes: ["name_product", "price"],
+                    required: false  // si esque el producto referenciado no existe, se muestre nulo 
                 }],
             }],
         }],
