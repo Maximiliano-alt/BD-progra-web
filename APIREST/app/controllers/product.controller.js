@@ -3,7 +3,8 @@ const Product = db.product;
 const Op      = db.Sequelize.Op;
 
 // Crear un nuevo producto
-exports.create = (req, res) => {
+exports.create = (req, res) => 
+{
     // Validar consulta (campos no vacios)
     if (!req.body.category && !req.body.name_product && !req.body.mark && !req.body.price && !req.body.stock && !req.body.id_provider) {
         res.status(400).send({ message: "Content can not be empty!" });
@@ -30,9 +31,11 @@ exports.create = (req, res) => {
 };
 
 //Retornar los productos de la base de datos.
-exports.findAll = (req, res) => {
-    const id = req.query.id_product;
-    var condition = id ? { id: { [Op.like]: `%${id}%` } } : null;
+exports.findAll = (req, res) => 
+{
+    const {id}    = req.query;
+    var condition = id? { id_product: { [Op.like]: `%${id}%` } } : null;
+
     Product.findAll({ where: condition }) // busca las tuplas que coincida con la codición
     .then(data => {
         res.send(data);
@@ -41,8 +44,39 @@ exports.findAll = (req, res) => {
         res.status(500).send({ message: err.message || "Error en la búsqueda"});
     });
 };
+
+exports.findAllByCategory = (req, res) =>
+{
+    const { category } = req.params;
+    var condition      = category? {category: { [Op.like]: `%${category}%` }} : null;
+
+    Product.findAll({ where: condition })
+    .then(data =>{
+        res.send(data);
+    })
+    .catch(err => {
+        res.status(500).send({ message: err.message || "Error en la búsqueda por categoría"});
+    });
+}
+
+exports.findAllByStock= (req, res) =>
+{
+    const { stock } = req.params;
+    var condition   = (stock>=0)? { stock: { [Op.eq]: stock } } : null;
+
+    Product.findAll({ where: condition })
+    .then(data => {
+        if (!condition) res.send({ message: "Valor de stock incorrecto"});
+        else            res.send(data);
+    })
+    .catch(err => {
+        res.status(500).send({ message: err.message || "Error en la búsqueda por categoría"});
+    });
+}
+
 // Buscar un producto por su id
-exports.findOne = (req, res) => {
+exports.findOne = (req, res) => 
+{
     const id = req.params.id_product;
 
     Product.findByPk(id) // busacar por id
@@ -53,14 +87,14 @@ exports.findOne = (req, res) => {
     .catch(err => {
         res.status(500).send({ message: "Error en la búsqueda"});
     });
-     
 };
 
 // actualizar un producto por su id
-exports.update = (req, res) => {
+exports.update = (req, res) => 
+{
     const id = req.params.id_product;
 
-    Product.update(req.body, {  where: { id_product: id }})
+    Product.update(req.body, { where: { id_product: id } })
     .then(num => {
         if (num == 1) res.send({ message: "Producto actualizado."});
         else          res.send({ message: `No se pudo actualizar el producto`});
@@ -69,11 +103,11 @@ exports.update = (req, res) => {
     .catch(err => {
         res.status(500).send({ message: "Error en actualización"});
     });
-     
 };
 
 // eliminar un producto
-exports.delete = (req, res) => {
+exports.delete = (req, res) => 
+{
     const id = req.params.id_product;
 
     Product.destroy({where: { id_product: id }})
@@ -88,8 +122,8 @@ exports.delete = (req, res) => {
 };
 
 // eliminar todos los produtos
-exports.deleteAll = (req, res) => {
-
+exports.deleteAll = (req, res) => 
+{
     Product.destroy({ where: {}, truncate: false })
     .then(nums => {
         res.send({ message: `${nums} productos eliminados!` });
@@ -97,5 +131,4 @@ exports.deleteAll = (req, res) => {
     .catch(err => {
         res.status(500).send({ message: err.message || "Error al eliminar a todos los productos." });
     });
-    
 };

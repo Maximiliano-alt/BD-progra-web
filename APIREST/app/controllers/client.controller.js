@@ -78,7 +78,7 @@ exports.findOne = (req, res) =>
     });
 };
 
-exports.allBuysById = (req, res) =>
+exports.findAllBuysById = (req, res) =>
 {
     const id      = req.params?.id_client;
     var condition = id ? { id_client: id } : null;
