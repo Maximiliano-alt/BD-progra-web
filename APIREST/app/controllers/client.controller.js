@@ -31,7 +31,14 @@ exports.findAll = (req, res) =>
     const { id }  = req.query; //...../all ? id = 1
     let condition = id ? { id_client: { [Op.like]: `%${id}%` } } : null;
 
-    Client.findAll({ where: condition }) // busca las tuplas que coincida con la codición
+    Client.findAll({
+        include: [{
+            model: db.user,
+            attributes: { exclude: ["password","updatedAt"] }
+        }],
+        where: condition,    // busca las tuplas que coincida con la codición
+        attributes: { exclude: ["createdAt","updatedAt","rut"] }
+    })
     .then(data => {
         res.send(data);
     })
@@ -53,7 +60,7 @@ exports.findNameMail = (req, res) =>
             attributes: ["first_name","last_name","mail"]
         }], 
         where: condition,  // busca las tuplas que coincida con la codición
-        attributes: { exclude: ["id_client", "rut", "createdAt", "updatedAt"]} // para atributos que no se necesitan recoger
+        attributes: { exclude: ["rut", "createdAt", "updatedAt"]} // para atributos que no se necesitan recoger
     })
     .then(data => {
         res.send(data);
@@ -68,7 +75,13 @@ exports.findOne = (req, res) =>
 {
     const id = req.params.id_client;
 
-    Client.findByPk(id) // busacar por id
+    Client.findByPk(id, {  // busacar por id
+        include: [{
+            model: db.user,
+            attributes: { exclude: ["password","updatedAt"] }
+        }],
+        attributes: { exclude: ["createdAt","updatedAt","rut"] }
+    })
     .then(data => {
         if (data) res.send(data); // existe el dato? entrega la data
         else      res.status(404).send({ message: `No se encontró al cliente.`});
@@ -86,8 +99,8 @@ exports.findAllBuysById = (req, res) =>
     Client.findAll({ 
         include: [{
             model: db.cart,
-            through: { attributes: [] }, //through: { attributes: [] }: para no obtener atributos de la tabla de union entre cliente y carro
-            attributes: ["id_cart"],
+            through: { attributes: ["date_buy"] }, //through: { attributes: [] }: para no obtener atributos de la tabla de union entre cliente y carro
+            attributes: ["total_products", "total_price"],
             include: [{
                 model: db.purchasedProduct,
                 attributes: ["units"],
