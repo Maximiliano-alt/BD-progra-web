@@ -33,10 +33,20 @@ exports.create = (req, res) =>
 //Retornar los productos de la base de datos.
 exports.findAll = (req, res) => 
 {
-    const {id}    = req.query;
-    var condition = id? { id_product: { [Op.like]: `%${id}%` } } : null;
+    const {ctgry, price, typeAccount} = req.query;
+    var condition = null;
 
-    Product.findAll({ where: condition }) // busca las tuplas que coincida con la codición
+    //asignar condicion de acuerdo al filtro por parámetro
+    if (ctgry && price) condition = { category: { [Op.like]: `%${ctgry}%`}, price:{ [Op.lte]: price }};
+    else{
+        if (ctgry) condition = { category: {[Op.like]: `%${ctgry}%`} };
+        if (price) condition = { price:    {[Op.lte]: price} };
+    }
+
+    Product.findAll({
+        attributes: { exclude: (typeAccount=="A")? [] : ["id_product","id_provider", "createdAt","updatedAt"] },
+        where: condition    // busca las tuplas que coincida con la codición
+    })
     .then(data => {
         res.send(data);
     })
@@ -44,20 +54,6 @@ exports.findAll = (req, res) =>
         res.status(500).send({ message: err.message || "Error en la búsqueda"});
     });
 };
-
-exports.findAllByCategory = (req, res) =>
-{
-    const { category } = req.params;
-    var condition      = category? {category: { [Op.like]: `%${category}%` }} : null;
-
-    Product.findAll({ where: condition })
-    .then(data =>{
-        res.send(data);
-    })
-    .catch(err => {
-        res.status(500).send({ message: err.message || "Error en la búsqueda por categoría"});
-    });
-}
 
 exports.findAllByStock= (req, res) =>
 {
@@ -74,12 +70,19 @@ exports.findAllByStock= (req, res) =>
     });
 }
 
-// Buscar un producto por su id
+// Buscar un producto por su id (provider) o name (client)
 exports.findOne = (req, res) => 
 {
-    const id = req.params.id_product;
+    const {id, name} = req.query;
+    var condition = null;
 
-    Product.findByPk(id) // busacar por id
+    if (id)         condition = { id_product: {[Op.like]: `%${id}%`} };
+    else if (name)  condition = { name_product: {[Op.like]: `%${name}%`} };
+
+    Product.findOne({
+        attributes: { exclude: (id && !name)? [] : ["id_product","category","id_provider", "createdAt","updatedAt"]},
+        where: condition
+    })
     .then(data => {
         if (data) res.send(data); // existe el dato? entrega la data
         else      res.status(404).send({ message: `No se encontró el producto`});
