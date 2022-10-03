@@ -34,9 +34,9 @@ exports.create = (req, res) =>
 exports.findAll = (req, res) => 
 {
     const first_name = req.query.first_name;
-    
     var condition = first_name ? { first_name: { [Op.like]: `%${first_name}%` } } : null;
-    User.findAll({ where: condition }) // busca las tuplas que coincida con la codición
+
+    User.findAll({ where: condition, attributes: {exclude:["updatedAt","password"]} }) // busca las tuplas que coincida con la codición
     .then(data => {
         res.send(data);
     })
@@ -46,10 +46,11 @@ exports.findAll = (req, res) =>
 }
 
 // Buscar un usuario por su id
-exports.findOne = (req, res) => {
+exports.findOne = (req, res) => 
+{
     const id = req.params.rut;
 
-    User.findByPk(id) // busacar por id
+    User.findByPk(id, {attributes: {exclude:["updatedAt","password"]}}) // busacar por id
     .then(data => {
         if (data) res.send(data); // existe el dato? entrega la data
         else      res.status(404).send({ message: `No se encontró al usuario.`});
@@ -57,14 +58,14 @@ exports.findOne = (req, res) => {
     .catch(err => {
         res.status(500).send({ message: "Error en la búsqueda"});
     });
-     
 };
 
 // actualizar un usuario por su id
-exports.update = (req, res) => {
+exports.update = (req, res) => 
+{
     const id = req.params.rut;
 
-    Client.update(req.body, {  where: { rut: id }})
+    Client.update(req.body, { where: { rut: id }})
     .then(num => {
         if (num == 1) res.send({ message: "Usuario actualizado."});
         else          res.send({ message: `No se pudo actualizar al usuario`});
@@ -73,7 +74,6 @@ exports.update = (req, res) => {
     .catch(err => {
         res.status(500).send({ message: "Error en actualización"});
     });
-     
 };
 
 // eliminar un cliente
@@ -91,8 +91,8 @@ exports.delete = (req, res) =>
 };
 
 // eliminar a todos los usuarios
-exports.deleteAll = (req, res) => {
-
+exports.deleteAll = (req, res) => 
+{
     User.destroy({ where: {}, truncate: false })
     .then(nums => {
         res.send({ message: `${nums} usuarios eliminados!` });
@@ -100,5 +100,4 @@ exports.deleteAll = (req, res) => {
     .catch(err => {
         res.status(500).send({ message: err.message || "Error al eliminar a todos los usuarios." });
     });
-    
 };
