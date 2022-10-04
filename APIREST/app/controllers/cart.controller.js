@@ -25,11 +25,19 @@ exports.create = (req, res) =>
     });
 };
 
+const filter = (req) =>
+{
+    const {total_prod, total_price} = req.query;
+
+    if (total_prod && total_price) return { [Op.and]: [{ total_products: { [Op.eq]: total_prod} }, { total_price: { [Op.lte]: total_price} }] };
+    else return (total_prod || total_price)? { [Op.or]: [{ total_products: { [Op.eq]: total_prod} }, { total_price: { [Op.lte]: total_price} }] } : null;
+}
+
 //Retornar los carros de la base de datos.
 exports.findAll = (req, res) => 
 {
-    const id = req.query.id_cart;
-    var condition = id ? { id: { [Op.like]: `%${id}%` } } : null;
+    var condition = filter(req);
+
     Cart.findAll({ where: condition }) // busca las tuplas que coincida con la codición
     .then(data => {
         res.send(data);

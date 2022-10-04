@@ -30,13 +30,22 @@ exports.create = (req, res) =>
     });
 };
 
+const somethingSpecific = (specific) =>
+{
+    return (specific.first || specific.last || specific.direc);
+}
+
+const filter = (req) =>
+{
+    const specif = {first: req.query.first, last: req.query.last, direc: req.query.direc};
+    return  somethingSpecific(specif)? { [Op.or]: [{first_name: specif.first? specif.first: null}, {last_name: specif.last? specif.last: null}, {direction: specif.direc? specif.direc: null}]} : null;
+}
+
 // Retornar los usuarios de la base de datos.
 exports.findAll = (req, res) => 
 {
-    const first_name = req.query.first_name;
-    var condition = first_name ? { first_name: { [Op.like]: `%${first_name}%` } } : null;
-
-    User.findAll({ where: condition, attributes: {exclude:["updatedAt","password"]} }) // busca las tuplas que coincida con la codición
+    var condition = filter(req);
+    User.findAll({ where: condition, attributes:{ excluded:["password"]} }) // busca las tuplas que coincida con la codición
     .then(data => {
         res.send(data);
     })

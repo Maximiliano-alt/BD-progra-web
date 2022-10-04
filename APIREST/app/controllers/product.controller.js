@@ -30,21 +30,27 @@ exports.create = (req, res) =>
     });
 };
 
+//asignar condicion de acuerdo al filtro por parámetro
+const filter = (req) =>
+{
+    const {name, ctgry, price} = req.query;
+
+    if (ctgry && price && name) return {[Op.and]: [{ category: { [Op.like]: `%${ctgry}%`}}, { price: { [Op.lte]: price }}, {name_product: { [Op.like]: `%${name}%`}}]};
+    else if (ctgry && price)    return {[Op.and]: [{ category: ctgry}, { price: { [Op.lte]: price }}]};
+    else if (name && price)     return {[Op.and]: [{name_product: { [Op.like]: `%${name}%`}}, { price: { [Op.lte]: price }}]};
+    else if (ctgry && name)     return {[Op.and]: [{ category: ctgry}, {name_product: { [Op.like]: `%${name}%`}}]};
+    else{
+        return (ctgry || price || name)? {[Op.or]: [{ category: { [Op.like]: `%${ctgry}%`}}, { price: { [Op.lte]: price }}, {name_product: { [Op.like]: `%${name}%`}}]} : null;
+    }
+}
+
 //Retornar los productos de la base de datos.
 exports.findAll = (req, res) => 
 {
-    const {ctgry, price, typeAccount} = req.query;
-    var condition = null;
-
-    //asignar condicion de acuerdo al filtro por parámetro
-    if (ctgry && price) condition = { category: { [Op.like]: `%${ctgry}%`}, price:{ [Op.lte]: price }};
-    else{
-        if (ctgry) condition = { category: {[Op.like]: `%${ctgry}%`} };
-        if (price) condition = { price:    {[Op.lte]: price} };
-    }
+    var condition = filter(req);
 
     Product.findAll({
-        attributes: { exclude: (typeAccount=="A")? [] : ["id_product","id_provider", "createdAt","updatedAt"] },
+        attributes: { exclude: (req.query.typeAccount=="A")? [] : ["id_product","id_provider", "createdAt","updatedAt"] },
         where: condition    // busca las tuplas que coincida con la codición
     })
     .then(data => {

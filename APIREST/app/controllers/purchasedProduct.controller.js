@@ -29,17 +29,20 @@ exports.create = (req, res) =>
 //Retornar los productos comprados de la base de datos.
 exports.findAll = (req, res) => 
 {
-    const id = req.query.id;
-    var condition = id ? { id_purchased: { [Op.like]: `%${id}%` } } : null;
+    const {id_cart, name, ctgry} = req.query;
+
+    var condition1 = id_cart? {id_cart: { [Op.like]: `%${id_cart}%`}}: null;
+    var condition2 = (name || ctgry)? {[Op.or]: [{ category: { [Op.like]: `%${ctgry}%`}}, { name_product: { [Op.like]: `%${name}%`}}]} : null;
 
     Purchased.findAll({ 
         include:[{
             model: db.product,
-            required: false,
-            attributes: { exclude:["id_product","createdAt","updatedAt", "id_provider"] }
+            //required: false,
+            attributes: { exclude:["id_product","createdAt","updatedAt", "id_provider", "stock"] },
+            where: condition2
         }],
         attributes: { exclude:["updatedAt", "id_product"] },
-        where: condition // busca las tuplas que coincida con la codición
+        where: condition1 // busca las tuplas que coincida con la codición
     })
     .then(data => {
         res.send(data);

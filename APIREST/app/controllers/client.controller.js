@@ -28,15 +28,17 @@ exports.create = (req, res) =>
 // Retornar los clientes de la base de datos o con id especificado.
 exports.findAll = (req, res) => 
 {
-    const { id }  = req.query; //...../all ? id = 1
-    let condition = id ? { id_client: { [Op.like]: `%${id}%` } } : null;
+const {rut, first, last}  = req.query; //...../all ? id = 1
+    var condition1 = (rut)? {rut: rut} : null;
+    var condition2 = (first || last)? { [Op.or]: [{ first_name: first? first: null }, { last_name: last? last : null }] } : null;
 
     Client.findAll({
         include: [{
             model: db.user,
-            attributes: { exclude: ["password","updatedAt"] }
+            attributes: { exclude: ["password","updatedAt"] },
+            where: condition2
         }],
-        where: condition,    // busca las tuplas que coincida con la codición
+        where: condition1,    // busca las tuplas que coincida con la codición
         attributes: { exclude: ["createdAt","updatedAt","rut"] }
     })
     .then(data => {
@@ -91,15 +93,17 @@ exports.findOne = (req, res) =>
     });
 };
 
-exports.findAllBuysById = (req, res) =>
+exports.findAllBuys = (req, res) =>
 {
-    const id      = req.params?.id_client;
-    var condition = id ? { id_client: id } : null;
+    const {date_buy, id, rut, name_pro} = req.query;
+    var condition1 = (date_buy)?  { date_buy: { [Op.lte]: date_buy } } : null;
+    var condition2 = (name_pro)?  { name_product: name_pro } : null;
+    var condition3 = (id || rut)? { [Op.or]: [{ id_client: id? id: null}, { rut: rut? rut : null }] } : null;
 
-    Client.findAll({ 
+    Client.findAll({
         include: [{
             model: db.cart,
-            through: { attributes: ["date_buy"] }, //through: { attributes: [] }: para no obtener atributos de la tabla de union entre cliente y carro
+            through: { attributes: ["date_buy"], where: condition1 }, //through: { attributes: [] }: para no obtener atributos de la tabla de union entre cliente y carro
             attributes: ["total_products", "total_price"],
             include: [{
                 model: db.purchasedProduct,
@@ -107,12 +111,13 @@ exports.findAllBuysById = (req, res) =>
                 include: [{
                     model: db.product,
                     attributes: ["name_product", "price"],
-                    required: false  // si esque el producto referenciado no existe, se muestre nulo 
-                }],
-            }],
+                    where: condition2,
+                    //required: false  // si esque el producto referenciado no existe, se muestre nulo 
+                }]
+            }]
         }],
-        where: condition,
-        attributes: { exclude: ["id_client", "rut", "createdAt", "updatedAt"]}
+        attributes: { exclude: ["id_client", "createdAt", "updatedAt"]},
+        where: condition3
     })
     .then(data => {
         res.send(data);

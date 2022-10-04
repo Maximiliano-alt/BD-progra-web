@@ -24,18 +24,20 @@ exports.create = (req, res) =>
     });
 };
 
-//Retornar los clientes de la base de datos.
+//Retornar los proveedores de la base de datos.
 exports.findAll = (req, res) =>
 {
-    const id = req.query.id;
-    var condition = id ? { id_provider: { [Op.like]: `%${id}%` } } : null;
+    const {rut, first, last}  = req.query; //...../all ? id = 1
+    var condition1 = (rut)? {rut: rut} : null;
+    var condition2 = (first || last)? { [Op.or]: [{ first_name: first? first: null}, { last_name: last? last : null }]  } : null;
 
     Provider.findAll({ 
         include: [{
             model: db.user,
-            attributes: { exclude: ["password","updatedAt"] }
+            attributes: { exclude: ["password","updatedAt"] },
+            where: condition2
         }],
-        where: condition,    // busca las tuplas que coincida con la codición
+        where: condition1,    // busca las tuplas que coincida con la codición
         attributes: { exclude: ["createdAt","updatedAt","rut"] }
     })
     .then(data => {

@@ -26,13 +26,23 @@ exports.create = (req, res) =>
     });
 };
 
+const filter = (req) =>
+{
+    const {id_client, date } = req.query;
+
+    if (id_client && date) return { [Op.and]: [{ id_client: { [Op.like]: `%${id_client}%`} }, { date_buy: { [Op.lte]: date} }] };
+    else return (id_client || date)? { [Op.or]: [{ id_client: { [Op.like]: `%${id_client}%`} }, { date_buy: { [Op.lte]: date} }] } : null; 
+}
+
 // Retornar las compras de la base de datos.
 exports.findAll = (req, res) => 
 {
-    const id = req.query.id_buy;
-    var condition = id ? { id: { [Op.like]: `%${id}%` } } : null;
-    Buy.findAll({ where: condition }) // busca las tuplas que coincida con la condición
-    
+    var condition = filter(req);
+
+    Buy.findAll({ 
+        attributes: {exclude:["createdAt", "updatedAt"]},
+        where: condition 
+    }) // busca las tuplas que coincida con la condición
     .then(data => {
         res.send(data);
     })
