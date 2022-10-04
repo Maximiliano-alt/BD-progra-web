@@ -29,9 +29,21 @@ exports.create = (req, res) =>
 //Retornar los productos comprados de la base de datos.
 exports.findAll = (req, res) => 
 {
-    const id = req.query.id_product;
-    var condition = id ? { id: { [Op.like]: `%${id}%` } } : null;
-    Purchased.findAll({ where: condition }) // busca las tuplas que coincida con la codición
+    const {id_cart, name, ctgry} = req.query;
+
+    var condition1 = id_cart? {id_cart: { [Op.like]: `%${id_cart}%`}}: null;
+    var condition2 = (name || ctgry)? {[Op.or]: [{ category: { [Op.like]: `%${ctgry}%`}}, { name_product: { [Op.like]: `%${name}%`}}]} : null;
+
+    Purchased.findAll({ 
+        include:[{
+            model: db.product,
+            //required: false,
+            attributes: { exclude:["id_product","createdAt","updatedAt", "id_provider", "stock"] },
+            where: condition2
+        }],
+        attributes: { exclude:["updatedAt", "id_product"] },
+        where: condition1 // busca las tuplas que coincida con la codición
+    })
     .then(data => {
         res.send(data);
     })
@@ -40,51 +52,56 @@ exports.findAll = (req, res) =>
     });
 };
 
-// // Buscar producto/s comprado/s por su id carro
-// exports.findOne = (req, res) => 
-// {
-//     const id = req.params.id_cart;
-//     Purchased.findByPk(id) // buscar por id
+// Buscar producto comprado por id
+exports.findOne = (req, res) => 
+{
+    const {id} = req.params;
 
-//     .then(data => {
-//         if (data) res.send(data); // existe el dato? entrega la data
-//         else      res.status(404).send({ message: `No se encontró el/los producto/s comprado/s.`});
-//     })
-//     .catch(err => {
-//         res.status(500).send({ message: "Error en la búsqueda"});
-//     });
-     
-// };
+    Purchased.findByPk(id, { 
+        include: [{ 
+            model: db.product,
+            required: false,
+            attributes: { exclude:["id_product","createdAt","updatedAt", "id_provider"] }
+        }],
+        attributes: { exclude:["updatedAt", "id_product"] },
+    })
+    .then(data => {
+        if (data) res.send(data); // existe el dato? entrega la data
+        else      res.status(404).send({ message: `No se encontró el producto comprado.`});
+    })
+    .catch(err => {
+        res.status(500).send({ message: "Error en la búsqueda"});
+    });
+};
 
-// // actualizar un producto comprado por su id
-// exports.update = (req, res) => 
-// {
-//     const id = req.params.id_cart;
-//     Purchased.update(req.body, {  where: { id_cart: id }})
+// actualizar un producto comprado por su id
+exports.update = (req, res) => 
+{
+    const id = req.params.id;
+    Purchased.update(req.body, {  where: { id_purchased: id }})
 
-//     .then(num => {
-//         if (num == 1) res.send({ message: "Producto comprado actualizada."});
-//         else          res.send({ message: `No se pudo actualizar el producto comprado`});
+    .then(num => {
+        if (num == 1) res.send({ message: "Producto comprado actualizado."});
+        else          res.send({ message: `No se pudo actualizar el producto comprado`});
         
-//     })
-//     .catch(err => {
-//         res.status(500).send({ message: "Error en actualización"});
-//     });
-     
-// };
+    })
+    .catch(err => {
+        res.status(500).send({ message: "Error en actualización"});
+    });
+};
 
 // eliminar un producto comprado
 exports.delete = (req, res) => 
 {
-    const id = req.params.id_cart;
-    Purchased.destroy({where: { id_cart: id }})
+    const id = req.params.id;
+    Purchased.destroy({where: { id_purchased: id }})
 
     .then(num => {
-        if (num == 1) res.send({ message: "Producto/s comprado/s eliminado/s" });
-        else          res.send({ message: `Producto/s comprado/s no encontrado/s`});
+        if (num == 1) res.send({ message: "Producto comprado eliminado" });
+        else          res.send({ message: `Producto comprado no encontrado`});
     })
     .catch(err => {
-        res.status(500).send({ message: "Error al eliminar producto/s comprado/s"});
+        res.status(500).send({ message: "Error al eliminar producto comprado"});
     });
 };
 
@@ -93,10 +110,9 @@ exports.deleteAll = (req, res) =>
 {
     Purchased.destroy({ where: {}, truncate: false })
     .then(nums => {
-        res.send({ message: `${nums} Productos comprados eliminados!` });
+        res.send({ message: `Productos comprados eliminados! (${nums})` });
     })
     .catch(err => {
         res.status(500).send({ message: err.message || "Error al eliminar todos los productos comprados." });
     });
-    
 };

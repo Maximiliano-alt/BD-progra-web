@@ -1,12 +1,16 @@
 //Importar dependencias
 const express = require("express");
-const cors = require("cors");
-const db = require("./app/models");
-const app = express();
+const cors    = require("cors");
+const db      = require("./app/models");
+const app     = express();
+let morgan    = require("morgan");
+//let ndmon     = require("nodemon");
 
 app.use(cors());          //configuración de cors (control de acceso)
 app.use(express.json()); // analizar las solicitudes de tipo de contenido - application/json
 app.use(express.urlencoded({ extended: true })); // analizar las solicitudes de tipo de contenido - application/x-www-form-urlencoded
+app.use(morgan('dev'));
+
 
 // en producción
 db.sequelize.sync({alter: true})
