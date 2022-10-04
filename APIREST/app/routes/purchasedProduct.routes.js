@@ -5,10 +5,10 @@ module.exports = app =>
 
     router.post("/add", purchasedProduct.create);
     router.get("/all", purchasedProduct.findAll);
-    //router.get("/:id_cart", purchasedProduct.findOne);      // buscar purchasedProduct con id cart
-    //router.put("/:id_cart", purchasedProduct.update);       // actualizar purchasedProduct
-    router.delete("/:id_cart", purchasedProduct.delete);    // eliminar purchasedProduct con id cart
-    router.delete("/", purchasedProduct.deleteAll);         // eliminar todas los productos comprados
+    router.get("/:id", purchasedProduct.findOne);            // buscar purchasedProduct por id
+    router.put("/:id", purchasedProduct.update);             // actualizar purchasedProduct
+    router.delete("/:id", purchasedProduct.delete);          // eliminar purchasedProduct con id cart
+    router.delete("/", purchasedProduct.deleteAll);          // eliminar todas los productos comprados
     
     app.use('/purchasedProduct', router);
 };
