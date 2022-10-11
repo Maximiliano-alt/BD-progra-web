@@ -13,7 +13,7 @@ const associateUser = () =>
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   });
-  db.provider.belongsTo(db.user, { foreignKey: 'rut' });
+  db.provider.belongsTo(db.user, { as: 'providerUser', foreignKey: 'rut' });
   
   // o un usuario puede ser un cliente
   db.user.hasOne(db.client, {
@@ -24,13 +24,14 @@ const associateUser = () =>
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   });
-  db.client.belongsTo(db.user, { foreignKey: 'rut' });
+  db.client.belongsTo(db.user, { as: 'clientUser', foreignKey: 'rut' });
 }
 
 // una compra referencia a un cliente y a un carro con productos
 const associateBuy = () => 
 {
-  db.client.belongsToMany(db.cart, { through: db.buy,
+  db.client.hasMany(db.buy, {
+    as : 'clientBuys',
     foreignKey: {
       name: 'id_client',
       allowNull: true
@@ -38,21 +39,25 @@ const associateBuy = () =>
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE'
   });
+  db.buy.belongsTo(db.client, { as: 'buyerClient', foreignKey: 'id_client' });
 
-  db.cart.belongsToMany(db.client, { through: db.buy,
+  db.buy.hasMany(db.purchasedProduct, {
+    as : 'purchasedProducts',
     foreignKey: {
-      name: 'id_cart',
+      name: 'id_buy',
       allowNull: true
     },
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE'
   });
+  db.purchasedProduct.belongsTo(db.buy, { as: 'buyPurchased', foreignKey: 'id_buy' });
 }
 
 // un producto es referenciado por un proveedor
 const associateProduct = () =>
 {
   db.provider.hasMany(db.product, {
+    as: 'products',
     foreignKey: {
       name: 'id_provider',
       allowNull: true
@@ -60,25 +65,14 @@ const associateProduct = () =>
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE'
   });
-  db.product.belongsTo(db.provider, { foreignKey: 'id_provider' });
+  db.product.belongsTo(db.provider, { as: 'productProvider', foreignKey: 'id_provider' });
 }
 
-// producto/s comprado/s pertenece a un carro y hace referencia a producto/s
+// un producto comprado es un producto o se refiere a un producto
 const associatePurchased = () =>
 {
-  // producto/s comprado/a asosciado/s a un carro
-  db.cart.hasMany(db.purchasedProduct, {
-    foreignKey: {
-      name: 'id_cart',
-      allowNull: false
-    },
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE'
-  });
-  db.purchasedProduct.belongsTo(db.cart, { foreignKey: 'id_cart' });
-
-  // un producto comprado es un producto o se refiere a un producto
   db.product.hasOne(db.purchasedProduct, {
+    as : 'productPurchased',
     foreignKey: {
       name: 'id_product',
       allowNull: true
@@ -86,7 +80,7 @@ const associatePurchased = () =>
     onDelete: 'SET NULL',
     onUpdate: 'CASCADE'
   });
-  db.purchasedProduct.belongsTo(db.product, { foreignKey: 'id_product'})
+  db.purchasedProduct.belongsTo(db.product, { as: 'product', foreignKey: 'id_product' })
 }
 
 // Inicialización de Sequelize
@@ -106,7 +100,7 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-// Importa modelos a Sequelize
+// Importa modelos a Sequelize e inicializar asociaciones
 db.user     = require("./user.model.js")(sequelize, Sequelize);
 db.client   = require("./client.model.js")(sequelize, Sequelize);
 db.provider = require("./provider.model.js")(sequelize, Sequelize);
@@ -116,10 +110,8 @@ db.product  = require("./product.model.js")(sequelize, Sequelize);
 associateProduct();
 
 db.buy      = require("./buy.model.js")(sequelize, Sequelize);
-db.cart     = require("./cart.model.js")(sequelize, Sequelize);
-associateBuy();
-
 db.purchasedProduct = require("./purchasedProduct.model.js")(sequelize, Sequelize);
+associateBuy();
 associatePurchased();
 
 module.exports = db;

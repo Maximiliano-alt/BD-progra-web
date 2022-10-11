@@ -36,12 +36,11 @@ const filter = (req) =>
     const {name, ctgry, price} = req.query;
 
     if (ctgry && price && name) return {[Op.and]: [{ category: { [Op.like]: `%${ctgry}%`}}, { price: { [Op.lte]: price }}, {name_product: { [Op.like]: `%${name}%`}}]};
-    else if (ctgry && price)    return {[Op.and]: [{ category: ctgry}, { price: { [Op.lte]: price }}]};
-    else if (name && price)     return {[Op.and]: [{name_product: { [Op.like]: `%${name}%`}}, { price: { [Op.lte]: price }}]};
-    else if (ctgry && name)     return {[Op.and]: [{ category: ctgry}, {name_product: { [Op.like]: `%${name}%`}}]};
-    else{
+    else if (ctgry && price)    return {[Op.and]: [{ category: ctgry }, { price: { [Op.lte]: price }}]};
+    else if (name && price)     return {[Op.and]: [{ name_product: { [Op.like]: `%${name}%`}}, { price: { [Op.lte]: price }}]};
+    else if (ctgry && name)     return {[Op.and]: [{ category: ctgry }, {name_product: { [Op.like]: `%${name}%`}}]};
+    else
         return (ctgry || price || name)? {[Op.or]: [{ category: { [Op.like]: `%${ctgry}%`}}, { price: { [Op.lte]: price }}, {name_product: { [Op.like]: `%${name}%`}}]} : null;
-    }
 }
 
 //Retornar los productos de la base de datos.
@@ -61,7 +60,7 @@ exports.findAll = (req, res) =>
     });
 };
 
-exports.findAllByStock= (req, res) =>
+exports.findAllByStock = (req, res) =>
 {
     const { stock } = req.params;
     var condition   = (stock>=0)? { stock: { [Op.eq]: stock } } : null;
@@ -82,7 +81,7 @@ exports.findOne = (req, res) =>
     const {id, name} = req.query;
     var condition = null;
 
-    if (id)         condition = { id_product: {[Op.like]: `%${id}%`} };
+    if (id)         condition = { id_product: {[Op.eq]: id} };
     else if (name)  condition = { name_product: {[Op.like]: `%${name}%`} };
 
     Product.findOne({

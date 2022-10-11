@@ -29,11 +29,12 @@ exports.findAll = (req, res) =>
 {
     const {rut, first, last}  = req.query; //...../all ? id = 1
     var condition1 = (rut)? {rut: rut} : null;
-    var condition2 = (first || last)? { [Op.or]: [{ first_name: first? first: null}, { last_name: last? last : null }]  } : null;
+    var condition2 = (first || last)? { [Op.or]: [{ first_name: first? `%${first}%`: null}, { last_name: last? `%${last}%` : null }]  } : null;
 
     Provider.findAll({ 
         include: [{
             model: db.user,
+            as: 'providerUser',
             attributes: { exclude: ["password","updatedAt"] },
             where: condition2
         }],
@@ -56,6 +57,7 @@ exports.findOne = (req, res) =>
     Provider.findByPk(id_provider, {  // buscar por id
         include: [{
             model: db.user,
+            as: 'providerUser',
             attributes: { exclude: ["password", "updatedAt"] }
         }],
         attributes: { exclude: ["createdAt", "updatedAt", "rut"] }

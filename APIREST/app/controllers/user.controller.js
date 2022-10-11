@@ -30,22 +30,23 @@ exports.create = (req, res) =>
     });
 };
 
-const somethingSpecific = (specific) =>
-{
-    return (specific.first || specific.last || specific.direc);
-}
-
 const filter = (req) =>
 {
-    const specif = {first: req.query.first, last: req.query.last, direc: req.query.direc};
-    return  somethingSpecific(specif)? { [Op.or]: [{first_name: specif.first? specif.first: null}, {last_name: specif.last? specif.last: null}, {direction: specif.direc? specif.direc: null}]} : null;
+    const {first, last, direc} = req.query;
+
+    if (first && last && direc) return {[Op.and]: [{ first_name: { [Op.like]: `%${first}%`}}, { last_name: { [Op.like]: `%${last}%`}}, { direction: { [Op.like]: `%${direc}%`}}]};
+    else if (first && last) return {[Op.and]: [{ first_name: { [Op.like]: `%${first}%`}}, { last_name: { [Op.like]: `%${last}%`}}]};
+    else if (first && direc) return {[Op.and]: [{ first_name: { [Op.like]: `%${first}%`}}, { direction: { [Op.like]: `%${direc}%`}}]};
+    else if (last && direc) return {[Op.and]: [{ last_name: { [Op.like]: `%${last}%`}}, { direction: { [Op.like]: `%${direc}%`}}]};
+    else  
+        return (first || last || direc)? {[Op.or]: [{ first_name: { [Op.like]: `%${first}%`}}, { last_name: { [Op.like]: `%${last}%` }}, {direction: { [Op.like]: `%${direc}%`}}]} : null;
 }
 
 // Retornar los usuarios de la base de datos.
 exports.findAll = (req, res) => 
 {
     var condition = filter(req);
-    User.findAll({ where: condition, attributes:{ excluded:["password"]} }) // busca las tuplas que coincida con la codición
+    User.findAll({ where: condition, attributes:{ exclude:['password']} }) // busca las tuplas que coincida con la codición
     .then(data => {
         res.send(data);
     })

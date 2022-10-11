@@ -30,7 +30,6 @@ require("./app/routes/client.routes")(app);
 require("./app/routes/provider.routes")(app);
 require("./app/routes/product.routes")(app);
 require("./app/routes/buy.routes")(app);
-require("./app/routes/cart.routes")(app);
 require("./app/routes/purchasedProduct.routes")(app);
 
 // ruta simple

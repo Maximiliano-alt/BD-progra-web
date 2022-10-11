@@ -35,6 +35,7 @@ const {rut, first, last}  = req.query; //...../all ? id = 1
     Client.findAll({
         include: [{
             model: db.user,
+            as: 'clientUser',
             attributes: { exclude: ["password","updatedAt"] },
             where: condition2
         }],
@@ -58,7 +59,8 @@ exports.findNameMail = (req, res) =>
 
     Client.findAll({ 
         include: [{ 
-            model: db.user, 
+            model: db.user,
+            as: 'clientUser',
             attributes: ["first_name","last_name","mail"]
         }], 
         where: condition,  // busca las tuplas que coincida con la codición
@@ -72,6 +74,44 @@ exports.findNameMail = (req, res) =>
     });
 }
 
+exports.findAllBuys = (req, res) =>
+{
+    const {date_buy, id, rut, name_pro} = req.query;
+    var condition1 = (id || rut)? { [Op.or]: [{ id_client: id? id: null}, { rut: rut? rut : null }] } : null;
+    var condition2 = (date_buy)?  { date_buy: { [Op.lte]: date_buy } } : null;
+    var condition3 = (name_pro)?  { name_product: { [Op.like]: `%${name_pro}%` } } : null;
+
+    Client.findAll({
+        attributes: ['id_client'],
+        where: condition1,//? condition1 : condition2? {'$Instruments.size$': { [Op.eq]: 'small' }} : {},
+        include: [{
+            model: db.buy,
+            as: 'clientBuys',
+            where: condition2, //through: { attributes: [] }: para no obtener atributos de la tabla de union entre cliente y carro
+            attributes: ['total_products', 'total_price', 'date_buy'],
+            include: [{
+                model: db.purchasedProduct,
+                as: 'purchasedProducts',
+                attributes: ['units'],
+                include: [{
+                    model: db.product,
+                    as: 'product',
+                    attributes: ['name_product', 'price'],
+                    where: condition3,
+                    //required: false  // si esque el producto referenciado no existe, se muestre nulo 
+                }]
+            }],
+        }]
+    })
+    .then(data => {
+        res.send(data);
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).send({ message: err.message || "Error en la búsqueda"});
+    });
+}
+
 // Buscar un cliente por su id
 exports.findOne = (req, res) => 
 {
@@ -80,6 +120,7 @@ exports.findOne = (req, res) =>
     Client.findByPk(id, {  // busacar por id
         include: [{
             model: db.user,
+            as: 'clientUser',
             attributes: { exclude: ["password","updatedAt"] }
         }],
         attributes: { exclude: ["createdAt","updatedAt","rut"] }
@@ -92,41 +133,6 @@ exports.findOne = (req, res) =>
         res.status(500).send({ message: "Error en la búsqueda"});
     });
 };
-
-exports.findAllBuys = (req, res) =>
-{
-    const {date_buy, id, rut, name_pro} = req.query;
-    var condition1 = (date_buy)?  { date_buy: { [Op.lte]: date_buy } } : null;
-    var condition2 = (name_pro)?  { name_product: name_pro } : null;
-    var condition3 = (id || rut)? { [Op.or]: [{ id_client: id? id: null}, { rut: rut? rut : null }] } : null;
-
-    Client.findAll({
-        include: [{
-            model: db.cart,
-            through: { attributes: ["date_buy"], where: condition1 }, //through: { attributes: [] }: para no obtener atributos de la tabla de union entre cliente y carro
-            attributes: ["total_products", "total_price"],
-            include: [{
-                model: db.purchasedProduct,
-                attributes: ["units"],
-                include: [{
-                    model: db.product,
-                    attributes: ["name_product", "price"],
-                    where: condition2,
-                    //required: false  // si esque el producto referenciado no existe, se muestre nulo 
-                }]
-            }]
-        }],
-        attributes: { exclude: ["id_client", "createdAt", "updatedAt"]},
-        where: condition3
-    })
-    .then(data => {
-        res.send(data);
-    })
-    .catch(err => {
-        console.log(err);
-        res.status(500).send({ message: err.message || "Error en la búsqueda"});
-    });
-}
 
 // actualizar un cliente por su id
 exports.update = (req, res) => 

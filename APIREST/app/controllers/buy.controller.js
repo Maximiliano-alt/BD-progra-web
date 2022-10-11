@@ -6,15 +6,16 @@ const Op   = db.Sequelize.Op;
 exports.create = (req, res) => 
 {
     // Validar consulta
-    if (!req.body.date_buy && !req.body.id_client && !req.body.id_cart) {
+    if (!req.body.date_buy && !req.body.total_products && !req.body.total_price && !req.body.id_client) {
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
     // Create a buy
     const buy = {
-        date_buy:   req.body.date_buy,
-        id_client:  req.body.id_client,
-        id_cart:    req.body.id_cart
+        date_buy:       req.body.date_buy,
+        total_products: req.body.total_products,
+        total_price:    req.body.total_price,
+        id_client:      req.body.id_client
     };
     // Guardar en base de datos
     Buy.create(buy) // okey? entonces devuelve la data
@@ -28,7 +29,7 @@ exports.create = (req, res) =>
 
 const filter = (req) =>
 {
-    const {id_client, date } = req.query;
+    const {id_client, date} = req.query;
 
     if (id_client && date) return { [Op.and]: [{ id_client: { [Op.like]: `%${id_client}%`} }, { date_buy: { [Op.lte]: date} }] };
     else return (id_client || date)? { [Op.or]: [{ id_client: { [Op.like]: `%${id_client}%`} }, { date_buy: { [Op.lte]: date} }] } : null; 
@@ -109,5 +110,4 @@ exports.deleteAll = (req, res) =>
     .catch(err => {
         res.status(500).send({ message: err.message || "Error al eliminar todas las compras." });
     });
-    
 };
