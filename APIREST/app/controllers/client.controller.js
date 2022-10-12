@@ -74,20 +74,31 @@ exports.findNameMail = (req, res) =>
     });
 }
 
+const filter = (req) =>
+{
+    const {rut, dt_buy, name_pro} = req.query;
+    if (rut && dt_buy && name_pro)
+        return { [Op.and]: [{ rut: {[Op.like]: `%${rut}%`}}, { '$clientBuys.date_buy$': {[Op.like]: dt_buy}}, {'$clientBuys.purchasedProducts.product.name_product$': {[Op.like]:`%${name_pro}%`}}] };
+    else if (rut && dt_buy) 
+        return { [Op.and]: [{ rut: {[Op.like]: `%${rut}%`}}, { '$clientBuys.date_buy$': {[Op.like]: dt_buy}}] };
+    else if (rut && name_pro)
+        return { [Op.and]: [{ rut: {[Op.like]: `%${rut}%`}}, {'$clientBuys.purchasedProducts.product.name_product$': {[Op.like]:`%${name_pro}%`}}] };
+    else if (dt_buy && name_pro)
+        return { [Op.and]: [{ '$clientBuys.date_buy$': {[Op.like]: dt_buy}}, {'$clientBuys.purchasedProducts.product.name_product$': {[Op.like]:`%${name_pro}%`}}] };
+    else 
+        return  (rut || dt_buy || name_pro)? {[Op.or]: [{ rut: {[Op.like]: `%${rut}%`}}, { '$clientBuys.date_buy$': {[Op.like]: dt_buy}}, {'$clientBuys.purchasedProducts.product.name_product$': {[Op.like]:`%${name_pro}%`}}]} : null;
+}
+
 exports.findAllBuys = (req, res) =>
 {
-    const {date_buy, id, rut, name_pro} = req.query;
-    var condition1 = (id || rut)? { [Op.or]: [{ id_client: id? id: null}, { rut: rut? rut : null }] } : null;
-    var condition2 = (date_buy)?  { date_buy: { [Op.lte]: date_buy } } : null;
-    var condition3 = (name_pro)?  { name_product: { [Op.like]: `%${name_pro}%` } } : null;
+    const condition = filter(req);
 
     Client.findAll({
-        attributes: ['id_client'],
-        where: condition1,//? condition1 : condition2? {'$Instruments.size$': { [Op.eq]: 'small' }} : {},
+        attributes: ['id_client', 'rut'],
+        where: condition,
         include: [{
             model: db.buy,
             as: 'clientBuys',
-            where: condition2, //through: { attributes: [] }: para no obtener atributos de la tabla de union entre cliente y carro
             attributes: ['total_products', 'total_price', 'date_buy'],
             include: [{
                 model: db.purchasedProduct,
@@ -97,10 +108,9 @@ exports.findAllBuys = (req, res) =>
                     model: db.product,
                     as: 'product',
                     attributes: ['name_product', 'price'],
-                    where: condition3,
                     //required: false  // si esque el producto referenciado no existe, se muestre nulo 
                 }]
-            }],
+            }]
         }]
     })
     .then(data => {
@@ -113,7 +123,7 @@ exports.findAllBuys = (req, res) =>
 }
 
 // Buscar un cliente por su id
-exports.findOne = (req, res) => 
+exports.findOne = (req, res) =>
 {
     const id = req.params.id_client;
 
