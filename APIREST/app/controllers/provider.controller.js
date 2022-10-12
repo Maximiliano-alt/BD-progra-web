@@ -49,6 +49,24 @@ exports.findAll = (req, res) =>
     });
 };
 
+exports.findAllProducts = (req, res) =>
+{
+    Provider.findAll({ 
+        include: [{
+            model: db.product,
+            as: 'products',
+            attributes: { exclude: ["id_provider"] },
+        }],
+        attributes: { exclude: ["createdAt","updatedAt","rut"] },
+    })
+    .then(data => {
+        res.send(data);
+    })
+    .catch(err => {
+        res.status(500).send({ message: err.message || "Error en la búsqueda"});
+    });
+}
+
 // Buscar un provedor por su id
 exports.findOne = (req, res) => 
 {
