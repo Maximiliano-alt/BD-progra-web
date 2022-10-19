@@ -36,9 +36,9 @@ const filter = (req) =>
     const {name, ctgry, price} = req.query;
 
     if (ctgry && price && name) return {[Op.and]: [{ category: { [Op.like]: `%${ctgry}%`}}, { price: { [Op.lte]: price }}, {name_product: { [Op.like]: `%${name}%`}}]};
-    else if (ctgry && price)    return {[Op.and]: [{ category: ctgry }, { price: { [Op.lte]: price }}]};
+    else if (ctgry && price)    return {[Op.and]: [{ category: { [Op.like]: `%${ctgry}%`} }, { price: { [Op.lte]: price }}]};
     else if (name && price)     return {[Op.and]: [{ name_product: { [Op.like]: `%${name}%`}}, { price: { [Op.lte]: price }}]};
-    else if (ctgry && name)     return {[Op.and]: [{ category: ctgry }, {name_product: { [Op.like]: `%${name}%`}}]};
+    else if (ctgry && name)     return {[Op.and]: [{ category: { [Op.like]: `%${ctgry}%`} }, { name_product: { [Op.like]: `%${name}%`}}]};
     else
         return (ctgry || price || name)? {[Op.or]: [{ category: { [Op.like]: `%${ctgry}%`}}, { price: { [Op.lte]: price }}, {name_product: { [Op.like]: `%${name}%`}}]} : null;
 }
@@ -78,14 +78,11 @@ exports.findAllByStock = (req, res) =>
 // Buscar un producto por su id (provider) o name (client)
 exports.findOne = (req, res) => 
 {
-    const {id, name} = req.query;
-    var condition = null;
-
-    if (id)         condition = { id_product: {[Op.eq]: id} };
-    else if (name)  condition = { name_product: {[Op.like]: `%${name}%`} };
+    const {id_prod} = req.params;
+    var condition = { id_product: {[Op.eq]: id_prod} };
 
     Product.findOne({
-        attributes: { exclude: (id && !name)? [] : ["id_product","category","id_provider", "createdAt","updatedAt"]},
+        attributes: { exclude: ["id_product","category","id_provider", "createdAt","updatedAt"]},
         where: condition
     })
     .then(data => {
@@ -100,9 +97,9 @@ exports.findOne = (req, res) =>
 // actualizar un producto por su id
 exports.update = (req, res) => 
 {
-    const id = req.params.id_product;
+    const id = req.params.id_prod;
 
-    Product.update(req.body, { where: { id_product: id } })
+    Product.update(req.body, { where: { id_product: {[Op.eq]: id} } })
     .then(num => {
         if (num == 1) res.send({ message: "Producto actualizado."});
         else          res.send({ message: `No se pudo actualizar el producto`});
@@ -116,9 +113,9 @@ exports.update = (req, res) =>
 // eliminar un producto
 exports.delete = (req, res) => 
 {
-    const id = req.params.id_product;
+    const id = req.params.id_prod;
 
-    Product.destroy({where: { id_product: id }})
+    Product.destroy({where: { id_product: {[Op.eq]: id} }})
     .then(num => {
         if (num == 1) res.send({ message: "Producto eliminado" });
         else          res.send({ message: `Producto no encontrado`});

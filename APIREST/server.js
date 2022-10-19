@@ -13,7 +13,7 @@ app.use(morgan('dev'));
 
 
 // en producción
-db.sequelize.sync({alter: true})
+db.sequelize.sync({alter: true}) // sincronizar todos los modelos
   .then(() => {
       console.log("Synced db.");
   })

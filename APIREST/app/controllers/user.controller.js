@@ -60,7 +60,7 @@ exports.findOne = (req, res) =>
 {
     const id = req.params.rut;
 
-    User.findByPk(id, {attributes: {exclude:["updatedAt","password"]}}) // busacar por id
+    User.findByPk(id, {attributes: {exclude:["password"]}}) // busacar por id
     .then(data => {
         if (data) res.send(data); // existe el dato? entrega la data
         else      res.status(404).send({ message: `No se encontró al usuario.`});

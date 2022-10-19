@@ -30,17 +30,17 @@ exports.findAll = (req, res) =>
 {
 const {rut, first, last}  = req.query; //...../all ? id = 1
     var condition1 = (rut)? {rut: rut} : null;
-    var condition2 = (first || last)? { [Op.or]: [{ first_name: first? first: null }, { last_name: last? last : null }] } : null;
+    var condition2 = (first || last)? { [Op.or]: [{ first_name: {[Op.like]: `%${first}%`} }, { last_name: {[Op.like]: `%${last}%`} }] } : null;
 
     Client.findAll({
+        where: condition1,    // busca las tuplas que coincida con la codición
+        attributes: { exclude: ["createdAt","updatedAt","rut"] },
         include: [{
             model: db.user,
             as: 'clientUser',
             attributes: { exclude: ["password","updatedAt"] },
             where: condition2
-        }],
-        where: condition1,    // busca las tuplas que coincida con la codición
-        attributes: { exclude: ["createdAt","updatedAt","rut"] }
+        }]
     })
     .then(data => {
         res.send(data);
@@ -58,13 +58,13 @@ exports.findNameMail = (req, res) =>
     var condition = id ? { id_client: { [Op.like]: `%${id}%` } } : null;
 
     Client.findAll({ 
+        where: condition,  // busca las tuplas que coincida con la codición
+        attributes: { exclude: ["rut", "createdAt", "updatedAt"]}, // para atributos que no se necesitan recoger
         include: [{ 
             model: db.user,
             as: 'clientUser',
             attributes: ["first_name","last_name","mail"]
-        }], 
-        where: condition,  // busca las tuplas que coincida con la codición
-        attributes: { exclude: ["rut", "createdAt", "updatedAt"]} // para atributos que no se necesitan recoger
+        }]
     })
     .then(data => {
         res.send(data);
@@ -128,12 +128,12 @@ exports.findOne = (req, res) =>
     const id = req.params.id_client;
 
     Client.findByPk(id, {  // busacar por id
+        attributes: { exclude: ["createdAt","updatedAt","rut"] },
         include: [{
             model: db.user,
             as: 'clientUser',
             attributes: { exclude: ["password","updatedAt"] }
-        }],
-        attributes: { exclude: ["createdAt","updatedAt","rut"] }
+        }]
     })
     .then(data => {
         if (data) res.send(data); // existe el dato? entrega la data
@@ -149,7 +149,7 @@ exports.update = (req, res) =>
 {
     const id = req.params.id_client;
 
-    Client.update(req.body, {  where: { id_client: id }})
+    Client.update(req.body, { where: { id_client: id }})
     .then(num => {
         if (num == 1) res.send({ message: "Cliente actualizado."});
         else          res.send({ message: `No se pudo actualizar al cliente`});
@@ -169,7 +169,6 @@ exports.delete = (req, res) =>
     .then(num => {
         if (num == 1) res.send({ message: "Cliente eliminado" });
         else          res.send({ message: `Cliente no encontrado`});
-        
     })
     .catch(err => {
         res.status(500).send({ message: "Error al eliminar cliente"});

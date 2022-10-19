@@ -29,10 +29,10 @@ exports.create = (req, res) =>
 
 const filter = (req) =>
 {
-    const {id_client, date} = req.query;
+    const {id_cl, date} = req.query;
 
-    if (id_client && date) return { [Op.and]: [{ id_client: { [Op.like]: `%${id_client}%`} }, { date_buy: { [Op.lte]: date} }] };
-    else return (id_client || date)? { [Op.or]: [{ id_client: { [Op.like]: `%${id_client}%`} }, { date_buy: { [Op.lte]: date} }] } : null; 
+    if (id_cl && date) return { [Op.and]: [{ id_client: { [Op.like]: `%${id_cl}%`} }, { date_buy: { [Op.lte]: date} }] };
+    else return (id_cl || date)? { [Op.or]: [{ id_client: { [Op.like]: `%${id_cl}%`} }, { date_buy: { [Op.lte]: date} }] } : null; 
 }
 
 // Retornar las compras de la base de datos.
@@ -41,8 +41,18 @@ exports.findAll = (req, res) =>
     var condition = filter(req);
 
     Buy.findAll({ 
-        attributes: {exclude:["createdAt", "updatedAt"]},
-        where: condition 
+        attributes: {exclude:["createdAt", "updatedAt", "id_client"]},
+        where: condition, 
+        include: [{
+            model: db.client,
+            as: 'buyerClient',
+            attributes: { exclude: ["rut","updatedAt", "createdAt"] },
+            include: [{
+                model: db.user,
+                as: "clientUser",
+                attributes: { exclude: ["direction","password","updatedAt", "createdAt"] }
+            }]
+        }]
     }) // busca las tuplas que coincida con la condición
     .then(data => {
         res.send(data);
@@ -65,7 +75,6 @@ exports.findOne = (req, res) =>
     .catch(err => {
         res.status(500).send({ message: "Error en la búsqueda"});
     });
-     
 };
 
 // actualizar una compra por su id
