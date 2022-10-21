@@ -1,30 +1,99 @@
-const db   = require("../models");
-const Buy  = db.buy;
-const Op   = db.Sequelize.Op;
+const db  = require("../models");
+const Buy = db.buy;
+const Op  = db.Sequelize.Op;
+
+const isValidPurchased = (purchased) =>
+{
+    return (purchased.id_product && purchased.units);
+}
+
+const isValidBoughtProducts = (purchasedProds) =>
+{
+    const size = purchasedProds.size();
+    if (size == 0) return false;
+    
+    for (p=0; p<size; ++p){
+        if (!isValidPurchased(purchasedProds[p])) return false;
+    }
+    return true;
+}
+
+const isValidBuy = (req)=>
+{
+    return (req.body.date_buy && req.body.total_products && req.body.total_price && req.body.id_client);
+}
+
+const isDataValid = (req) =>
+{
+    return (isValidBuy(req) && isValidBoughtProducts(req.body.purchasedProds));
+}
+
+const availableStock = (purchasedProds) =>
+{
+    
+}
+
+const createPurchasedProducts = (req, id_buy, res) =>
+{
+    const size      = req.body.purchasedProds.size();
+    const Purchased = db.purchasedProduct();
+
+    for (p=0; p<size; ++p)
+    {
+        Purchased.create({
+            units:      req.body.purchasedProds[p].units,
+            id_buy:     id_buy,
+            id_product: req.body.purchasedProds[p].id_product
+        })
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {     // error 500: 
+            res.status(500).send({ message: err.message || "Error al crear un nuevo producto comprado"});
+        });
+    }
+}
+
+const discountStock = (req) =>
+{
+    size = req.body.purchasedProds.size();
+    for (p=0; p<size; ++p){
+
+    }
+}
 
 // Crear una nueva compra
 exports.create = (req, res) => 
 {
     // Validar consulta
-    if (!req.body.date_buy && !req.body.total_products && !req.body.total_price && !req.body.id_client) {
+    if (!isDataValid(req)){
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
+
+    if (!availableStock(req.body.purchasedProds)){
+        res.status(400).send({ message: "!" });
+        return;
+    }
+
     // Create a buy
     const buy = {
         date_buy:       req.body.date_buy,
         total_products: req.body.total_products,
-        total_price:    req.body.total_price,
+        total_price:    req.body.total_price*1.19,
         id_client:      req.body.id_client
     };
     // Guardar en base de datos
-    Buy.create(buy) // okey? entonces devuelve la data
+    const by = Buy.create(buy) // okey? entonces devuelve la data
     .then(data => {
         res.send(data);
     })
     .catch(err => {     // error 500: 
         res.status(500).send({ message: err.message || "Error al crear una nueva compra"});
     });
+
+    discountStock(req);
+    createPurchasedProducts(req, by.id_buy, res); // instaciar en bd tosos los productos comprados
 };
 
 const filter = (req) =>
