@@ -1,9 +1,13 @@
 import React from 'react'
+import { Routes, Route } from 'react-router-dom';
+import Login from '../pages/Login'
 
-const index = () => {
+const PageRoutes = () => {
   return (
-    <div>index</div>
+    <Routes>
+        <Route path='/' element={<Login/>}/>
+    </Routes>
   )
 }
 
-export default index
+export default PageRoutes

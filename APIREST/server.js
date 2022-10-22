@@ -13,7 +13,7 @@ app.use(morgan('dev'));
 
 
 // en producción
-db.sequelize.sync({alter: true})
+db.sequelize.sync({alter: true}) // sincronizar todos los modelos
   .then(() => {
       console.log("Synced db.");
   })
@@ -30,7 +30,6 @@ require("./app/routes/client.routes")(app);
 require("./app/routes/provider.routes")(app);
 require("./app/routes/product.routes")(app);
 require("./app/routes/buy.routes")(app);
-require("./app/routes/cart.routes")(app);
 require("./app/routes/purchasedProduct.routes")(app);
 
 // ruta simple

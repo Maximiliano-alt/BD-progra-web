@@ -27,18 +27,23 @@ exports.create = (req, res) =>
 //Retornar los proveedores de la base de datos.
 exports.findAll = (req, res) =>
 {
-    const {rut, first, last}  = req.query; //...../all ? id = 1
-    var condition1 = (rut)? {rut: rut} : null;
-    var condition2 = (first || last)? { [Op.or]: [{ first_name: first? first: null}, { last_name: last? last : null }]  } : null;
+    const {rut, first, last} = req.query; //...../all ? id = 1
+    var condition1 = (rut)? {rut: {[Op.like]:`%${rut}%`}} : null;
+    const condition2 = () =>
+    {   if(first && last) return {[Op.and]: [{ first_name: {[Op.like]: `%${first}%`}}, { last_name: {[Op.like]: `%${last}%`} }]};
+        else 
+            return (first || last)? { [Op.or]: [{ first_name: {[Op.like]: `%${first}%`}}, { last_name: {[Op.like]: `%${last}%`} }]  } : null;
+    }
 
     Provider.findAll({ 
+        where: condition1,    // busca las tuplas que coincida con la codición
+        attributes: { exclude: ["createdAt","updatedAt","rut"] },
         include: [{
             model: db.user,
+            as: 'providerUser',
             attributes: { exclude: ["password","updatedAt"] },
-            where: condition2
-        }],
-        where: condition1,    // busca las tuplas que coincida con la codición
-        attributes: { exclude: ["createdAt","updatedAt","rut"] }
+            where: condition2()
+        }]
     })
     .then(data => {
         res.send(data);
@@ -48,17 +53,39 @@ exports.findAll = (req, res) =>
     });
 };
 
+exports.findAllProducts = (req, res) =>
+{   
+    const {id_prov} = req.params;
+
+    Provider.findAll({
+        attributes: { exclude: ["createdAt", "updatedAt", "rut", "id_provider"] },
+        where: { id_provider: {[Op.eq]: id_prov} },
+        include: [{
+            model: db.product,
+            as: 'products',
+            attributes: { exclude: ["id_provider"] }
+        }],
+    })
+    .then(data => {
+        res.send(data);
+    })
+    .catch(err => {
+        res.status(500).send({ message: err.message || "Error en la búsqueda"});
+    });
+}
+
 // Buscar un provedor por su id
 exports.findOne = (req, res) => 
 {
-    const {id_provider} = req.params;
+    const {id_prov} = req.params;
 
-    Provider.findByPk(id_provider, {  // buscar por id
+    Provider.findByPk(id_prov, {  // buscar por id
+        attributes: { exclude: ["createdAt", "updatedAt", "rut"] },
         include: [{
             model: db.user,
+            as: 'providerUser',
             attributes: { exclude: ["password", "updatedAt"] }
-        }],
-        attributes: { exclude: ["createdAt", "updatedAt", "rut"] }
+        }]
     })
     .then(data => {
         if (data) res.send(data); // existe el dato? entrega la data
@@ -72,9 +99,9 @@ exports.findOne = (req, res) =>
 // actualizar un provedor por su id
 exports.update = (req, res) => 
 {
-    const id = req.params.id_provider;
+    const id_prov = req.params;
 
-    Provider.update(req.body, {  where: { id_provider: id }})
+    Provider.update(req.body, { where: { id_provider: id_prov }})
     .then(num => {
         if (num == 1) res.send({ message: "Proveedor actualizado."});
         else          res.send({ message: `No se pudo actualizar al proveedor`});
@@ -86,11 +113,11 @@ exports.update = (req, res) =>
 };
 
 // eliminar un provedor
-exports.delete = (req, res) => 
+exports.delete = (req, res) =>
 {
-    const id = req.params.id_provider;
+    const id_prov = req.params;
 
-    Provider.destroy({where: { id_provider: id }})
+    Provider.destroy({where: { id_provider: id_prov }})
     .then(num => {
         if (num == 1) res.send({ message: "Proveedor eliminado" });
         else          res.send({ message: `Proveedor no encontrado`});

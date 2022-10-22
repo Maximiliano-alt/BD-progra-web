@@ -6,15 +6,15 @@ const Op        = db.Sequelize.Op;
 exports.create = (req, res) => 
 {
     // Validar consulta
-    if (!req.body.id_product && !req.body.id_cart && !req.body.units) {
+    if (!req.body.units && !req.body.id_product && !req.body.id_buy) {
         res.status(400).send({ message: "Content can not be empty!" });
         return;
     }
     // Create a purchased product
     const purchased = {
-        id_cart: req.body.id_cart,
-        id_product: req.body.id_product,
-        units: req.body.units,
+        units:      req.body.units,
+        id_buy:     req.body.id_buy,
+        id_product: req.body.id_product
     };
     // Guardar en base de datos
     Purchased.create(purchased) // okey? entonces devuelve la data
@@ -26,23 +26,28 @@ exports.create = (req, res) =>
     });
 };
 
+const filter = (req) =>
+{
+    const {name, ctgry} = req.query;
+
+    if (name && ctgry) return {[Op.and]: [{ category: { [Op.like]: `%${ctgry}%`}}, { name_product: { [Op.like]: `%${name}%`}}]};
+    else return (name || ctgry)? {[Op.or]: [{ category: { [Op.like]: `%${ctgry}%`}}, { name_product: { [Op.like]: `%${name}%`}}]} : null; 
+}
+
 //Retornar los productos comprados de la base de datos.
 exports.findAll = (req, res) => 
 {
-    const {id_cart, name, ctgry} = req.query;
-
-    var condition1 = id_cart? {id_cart: { [Op.like]: `%${id_cart}%`}}: null;
-    var condition2 = (name || ctgry)? {[Op.or]: [{ category: { [Op.like]: `%${ctgry}%`}}, { name_product: { [Op.like]: `%${name}%`}}]} : null;
+    var condition = filter(req);
 
     Purchased.findAll({ 
         include:[{
             model: db.product,
+            as: 'product',
             //required: false,
             attributes: { exclude:["id_product","createdAt","updatedAt", "id_provider", "stock"] },
-            where: condition2
+            where: condition
         }],
-        attributes: { exclude:["updatedAt", "id_product"] },
-        where: condition1 // busca las tuplas que coincida con la codición
+        attributes: { exclude:["updatedAt", "id_product"] }
     })
     .then(data => {
         res.send(data);
@@ -60,6 +65,7 @@ exports.findOne = (req, res) =>
     Purchased.findByPk(id, { 
         include: [{ 
             model: db.product,
+            as: 'product',
             required: false,
             attributes: { exclude:["id_product","createdAt","updatedAt", "id_provider"] }
         }],
