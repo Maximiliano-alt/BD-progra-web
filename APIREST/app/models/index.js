@@ -45,9 +45,9 @@ const associateBuy = () =>
     as : 'purchasedProducts',
     foreignKey: {
       name: 'id_buy',
-      allowNull: true
+      allowNull: false
     },
-    onDelete: 'SET NULL',
+    onDelete: 'CASCADE',
     onUpdate: 'CASCADE'
   });
   db.purchasedProduct.belongsTo(db.buy, { as: 'buyPurchased', foreignKey: 'id_buy' });

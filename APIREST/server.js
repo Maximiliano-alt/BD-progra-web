@@ -34,7 +34,7 @@ require("./app/routes/purchasedProduct.routes")(app);
 
 // ruta simple
 app.get("/", (req, res) => {
-  res.json({ message: "Welcome to electonicECOM page." });
+  res.json({ message: "Welcome to electonicECOM service." });
 });
 
 // Configurar puertos
