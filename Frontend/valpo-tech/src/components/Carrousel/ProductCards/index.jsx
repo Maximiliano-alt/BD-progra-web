@@ -4,14 +4,15 @@ import ProductService from '../../../services/Admin/ProductData.service'
 const ItemUnique = styled.div`
     background-color: #ffffff;
     color: black;
-    width: 95%;
-    height: 95%;
+    width: 90%;
+    height: 90%;
     display: flex;
     flex-direction: column;
     justify-content:start ;
     align-items: center ;
     border-radius: 20px;
     cursor: pointer;
+    display:grid;
 `
 const Label = styled.label`
     width:100%;
@@ -37,15 +38,25 @@ const ContainerButtons = styled.div`
     flex-direction: row;
 `
 const ButtonDelete = styled.button`
-    width:100%;
-    height: 32px;
+    width: 100%;
+    /* height: 32px; */
     background: #C84C04;
     border-radius: 0 0 17px 17px;
     color: white;
     cursor: pointer;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
     justify-content: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
     align-items: center;
+    -webkit-transition: all .2s ease-in-out;
     transition: all .2s ease-in-out;
     &:hover{
         background: #79340a;

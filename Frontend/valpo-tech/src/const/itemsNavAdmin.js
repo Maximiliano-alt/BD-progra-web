@@ -2,15 +2,15 @@ const itemsAdmin = [
     
     {
         nombre:"Productos",
-        path:'/products'
+        path:'products'
     },
     {
         nombre:"Pedidos",
-        path:'/orders'
+        path:'orders'
     },
     {
         nombre:"Clientes",
-        path:'/clients'
+        path:'clients'
     }
 ]
 
