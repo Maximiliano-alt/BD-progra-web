@@ -1,11 +1,12 @@
-import React from 'react'
+import React,{useState} from 'react'
 import { Formik, Form, Field,ErrorMessage,getIn } from "formik";
 import YupPassword from 'yup-password'
 import * as Yup from "yup";
 import {tablet} from "../../../const/screens.js"
 import { colorItemHoverNav,colorInputLogin } from '../../../const/colors.js';
 import styled from 'styled-components'
-
+import LoginAdminService from '../../../services/Admin/LoginAdmin.service.js';
+import { useNavigate } from 'react-router-dom';
 const Input = styled.input`
 
       width: 100%;
@@ -69,8 +70,28 @@ const Label = styled.label`
    
 `
 const InputLogin = (props) => {
-  
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
+  const [rut,setRut] = useState('')
+
+  const handleChange = event => {
+    setRut(event.target.value)
+    console.log('Rut: '+ event.target.value)
+  }
+  const login = async ( rut ) => {
+    LoginAdminService.get(rut)
+  .then((res) => {
+    if (res.status === 200) {
+      console.log("User: "+res.data)
+      return navigate( '/admin/products' );
+    } else Promise.reject();
+
+  })
+  .catch((err) => {
+
+    console.log(err)
+  });
+}
+
     const validationSchema = Yup.object().shape({
         username: Yup.string().email("You have enter an invalid email address").required(),
         // password: Yup.string().password("Wrong password").required(),
@@ -85,7 +106,7 @@ const InputLogin = (props) => {
     
               <Form  >
               <Label>LOGIN ADMIN</Label>
-                  <Input autocomplete="off" type="user"  placeholder='Nombre de usuario' name='user' />
+                  <Input autocomplete="off" type="user"  placeholder='RUT' name='rut' onChange={handleChange} value={rut} />
                    
                     {/* <Field  name="name" type="text" 
                     className="form-control" /> */}
@@ -103,7 +124,13 @@ const InputLogin = (props) => {
                       
                       component="span"
                   />
-                  <ButtonLogin type='submit'>
+                  <ButtonLogin type='submit'
+                    onClick={(e)=>{
+                      e.preventDefault();
+                      console.log("Usuario: "+rut)
+                      login(rut);
+                    }
+                    }>
                       Login
                       {props.children}
                   </ButtonLogin>

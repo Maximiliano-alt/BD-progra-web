@@ -40,6 +40,30 @@ const ContainerButtons = styled.div`
 const ButtonDelete = styled.button`
     width: 100%;
     /* height: 32px; */
+    background: red;
+    color:black;
+    border-radius: 0 0 17px 17px;
+    
+    cursor: pointer;
+    display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    -webkit-transition: all .2s ease-in-out;
+    transition: all .2s ease-in-out;
+   
+`
+const ButtonModify = styled.button`
+    width: 100%;
+    /* height: 32px; */
     background: white;
     color:black;
     border-radius: 0 0 17px 17px;
@@ -61,7 +85,6 @@ const ButtonDelete = styled.button`
     transition: all .2s ease-in-out;
    
 `
-
 
 const ImagesContainer = styled.div`
     border-radius: 20px 20px 0 0 ;
@@ -93,6 +116,7 @@ const ProductCards = (props) => {
         } else Promise.reject();
       })
       .catch((err) => {
+
         console.log(err)
       });
 
@@ -147,11 +171,18 @@ const ProductCards = (props) => {
         <ContainerButtons>
             <ButtonDelete onClick={(e)=>{
                 e.preventDefault();
-                console.log(props.producto.id_product)
+                console.log("producto> "+props.producto.id_product)
                 deleteProduct(props?.producto?.id_product);
             }}>
                 Eliminar
             </ButtonDelete>
+            <ButtonModify onClick={(e)=>{
+                e.preventDefault();
+                
+                deleteProduct(props?.producto?.id_product);
+            }}>
+                Modificar
+            </ButtonModify>
            
         </ContainerButtons>
     </ItemUnique>

@@ -1,31 +1,31 @@
 import http from "../http-common";
 
 const getAll = () => {
-  return http.get("/provider/all");
+  return http.get("user/all");
 };
 
-const get = id_prov => {
-  return http.get(`/provider/${id_prov}`);
+const get = rut => {
+  return http.get(`user/${rut}`);
 };
 
 const create = data => {
-  return http.post("/provider/add", data);
+  return http.post("user/add", data);
 };
 
 const update = (id, data) => {
-  return http.put(`/provider/${id}`, data);
+  return http.put(`user/${id}`, data);
 };
 
-const remove = id_prov => {
-  return http.delete(`/provider/${id_prov}`);
+const remove = rut => {
+  return http.delete(`user/${rut}`);
 };
 
 const removeAll = () => {
-  return http.delete(`/provider`);
+  return http.delete(`user`);
 };
 
 
-const ClientService = {
+const LoginAdminService = {
   getAll,
   get,
   create,
@@ -34,4 +34,4 @@ const ClientService = {
   removeAll
 };
 
-export default ClientService;
+export default LoginAdminService;
