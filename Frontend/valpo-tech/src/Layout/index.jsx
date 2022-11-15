@@ -1,6 +1,7 @@
 import React from 'react'
 import BackGround from './Background.jsx'
-
+import styled from 'styled-components'
+import NavComponent from '../components/Navbar/nav.jsx'
 const General = styled.div`
     width: 100vw;
     display: flex;
@@ -20,7 +21,8 @@ const Layout = ({children}) => {
   return (
     <BackGround>
         <General>
-        {children}
+          <NavComponent/>
+          {children}
         </General>
     </BackGround>
   )

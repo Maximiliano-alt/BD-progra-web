@@ -51,26 +51,7 @@ const ButtonLogin = styled.button`
 `
 const InputLogin = (props) => {
   
-    const getStyles= ()=>{
-      if (true) {
-        return {
-          border: '1px solid red',
-          width: '200%',
-          width: '100%',
-          height: '50%',
-          border: 'none',
-          outline: 'none',
-          color: 'white',
-          margin: '2%',
-          paddingLeft: '20px',
-          boxSizing:' border-box',
-          backgroundColor: 'rgba(255,255,255,0.1)',
-          fontSize: '1.2em',
-        
-        
-      }
-    }
-  }
+  //const navigate = useNavigate();
     const validationSchema = Yup.object().shape({
         username: Yup.string().email("You have enter an invalid email address").required(),
         // password: Yup.string().password("Wrong password").required(),

@@ -1,9 +1,91 @@
 import React from 'react'
+import styled from "styled-components";
+import { useLocation } from "react-router-dom";
+import ItemsAdmin from '../../const/itemsNavAdmin';
+import { colorItemHoverNav } from '../../const/colors';
+const Header = styled.div`
+    width: 100vw;
+    height: 50px;
+    background-color: ${ colorItemHoverNav };
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+`
+const TitlePage = styled.label`
+    color: white;
+    width: calc( 100vw - 100px );
+    text-align: center;
+    font-size: 1.2em;
+`
+const Container = styled.div`
+        position: absolute;
+    
+    transition: all 0.5s ease-in-out;
+    /* top: 50px; */
+    left: 0;
+    z-index: 2;
+    background-color: #c04b07;
+    
+`
+const Ul = styled.ul`
+    
+    /* width: 100%; */
+    /* height: 100%; */
+    margin: 0;
+    padding: 0;
+    display: inline-flex;
 
-const nav = () => {
+`
+const Link = styled.a`
+    color: white;
+    text-decoration: none;
+    font-size: 1.3em;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &:hover{
+        color: white;
+        
+    }
+`
+const Li = styled.li`
+    width: 100%;
+    color: white;
+    text-align: center;
+    height: 14%;
+    transition: background-color .2s ease-in-out;
+    &:hover{
+        background-color: #e46f02;
+    }
+    
+`
+const NavComponent = () => {
+  const SampleLocations = useLocation();
+  function capitalizarPrimeraLetra(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
   return (
-    <div>nav</div>
+    <Header>
+      <TitlePage htmlFor="">{capitalizarPrimeraLetra(SampleLocations.pathname.split('/')[1])}</TitlePage>
+      <Container >
+            <Ul>
+                {ItemsAdmin.map((item,index)=>{
+                    return( 
+                    <Li key={index}>
+                        <Link href={item.path}>{item.nombre}</Link>
+                    </Li>
+                    )
+                })}
+                
+                <Link href='admin/login'>Cerrar Sesion</Link>
+                
+            </Ul>
+        </Container>
+    </Header>
   )
 }
 
-export default nav
+export default NavComponent
