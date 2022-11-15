@@ -40,9 +40,10 @@ const ContainerButtons = styled.div`
 const ButtonDelete = styled.button`
     width: 100%;
     /* height: 32px; */
-    background: #C84C04;
+    background: white;
+    color:black;
     border-radius: 0 0 17px 17px;
-    color: white;
+    
     cursor: pointer;
     display: -webkit-box;
     display: -webkit-flex;
@@ -58,9 +59,7 @@ const ButtonDelete = styled.button`
     align-items: center;
     -webkit-transition: all .2s ease-in-out;
     transition: all .2s ease-in-out;
-    &:hover{
-        background: #79340a;
-    }
+   
 `
 
 

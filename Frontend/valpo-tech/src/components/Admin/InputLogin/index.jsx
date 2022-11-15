@@ -49,6 +49,25 @@ const ButtonLogin = styled.button`
   }
   
 `
+const Label = styled.label`
+        
+        font-family: 'Gill Sans','Gill Sans MT',Calibri,'Trebuchet MS',sans-serif;
+    /* font-style: normal; */
+    /* font-weight: 400; */
+    font-size: 12px;
+    line-height: 15px;
+    color: white;
+    font-size: 30px;
+    /* padding-left: 48px; */
+    -webkit-box-pack: center;
+    -webkit-justify-content: center;
+    -ms-flex-pack: center;
+    /* justify-content: center; */
+
+    
+    
+   
+`
 const InputLogin = (props) => {
   
   //const navigate = useNavigate();
@@ -61,9 +80,11 @@ const InputLogin = (props) => {
       password: '1234',
     }
   return (
+    
     <Formik {...props} validationSchema={validationSchema}>
+    
               <Form  >
-                
+              <Label>LOGIN ADMIN</Label>
                   <Input autocomplete="off" type="user"  placeholder='Nombre de usuario' name='user' />
                    
                     {/* <Field  name="name" type="text" 
