@@ -7,6 +7,8 @@ const PageRoutes = () => {
     <Routes>
         <Route path='/admin/login' element={<Login/>}/>
         <Route path='/admin/products' element={<Products/>}/>
+        <Route path='/client/allBuys' element={<Products/>}/>
+
     </Routes>
   )
 }
