@@ -1,33 +1,36 @@
 import http from "../http-common";
 
 const getAll = () => {
-  return http.get("product/all");
+  return http.get("client/all");
 };
 
-const get = id_prod => {
-  return http.get(`product/${id_prod}`);
+const get = id_client => {
+  return http.get(`client/${id_client}`);
 };
-
+const getBuys = rut => {
+    return http.get(`client/all-buys?rut=${rut}`);
+  };
 const create = data => {
-  return http.post("product/add", data);
+  return http.post("client/add", data);
 };
 
-const update = (id_prod, data) => {
-  return http.put(`product/${id_prod}`, data);
+const update = (id_client, data) => {
+  return http.put(`client/${id_client}`, data);
 };
 
 const remove = id_prod => {
-  return http.delete(`product/${id_prod}`);
+  return http.delete(`client/${id_prod}`);
 };
 
 const removeAll = () => {
-  return http.delete(`product`);
+  return http.delete(`client`);
 };
 
 
 const ProductServiceClient = {
   getAll,
   get,
+  getBuys,
   create,
   update,
   remove,

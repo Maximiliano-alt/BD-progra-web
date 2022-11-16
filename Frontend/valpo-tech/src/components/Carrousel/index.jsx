@@ -1,7 +1,8 @@
 import React from 'react'
 import { laptopL,laptop,tablet, mobileS, mobileL } from '../../const/screens'
 import styled from 'styled-components'
-import ProductCards from "./ProductCards/index.jsx"
+import ProductCards from '../Admin/ProductsCards'
+import AllBuysCards from '../Client/AllBuysCards'
 const Container = styled.div`
     width: 90%;
     max-width: 1000px;
@@ -61,6 +62,7 @@ const ButtonModify = styled.button`
 
 `
 const Carrousel = (props) => {
+    
   return (
     <Container>
         {
@@ -68,7 +70,7 @@ const Carrousel = (props) => {
                 return(
                     <ItemUnique key={index} >
                         {
-                            console.log("Productos:", data)
+                            console.log("Productos:", data?.clientBuys?.map((i) =>{return i}))
                         }
                         {/* <ButtonModify onClick={(e)=>{
                             e.preventDefault()
@@ -81,6 +83,14 @@ const Carrousel = (props) => {
                             props?.tipo === 'Product' && <ProductCards 
                                 // indice={index} 
                                 producto={data} 
+                                actualizar={props?.actualizar}
+                               
+                            />
+                        }
+                        {
+                            props?.tipo === 'Allbuys' && <AllBuysCards 
+                                // indice={index} 
+                                producto={data?.clientBuys} 
                                 actualizar={props?.actualizar}
                                
                             />

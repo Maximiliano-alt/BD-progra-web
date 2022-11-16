@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import ProductService from '../../../services/Admin/ProductData.service'
+import ProductServiceClient from '../../../services/Client/ProductData.service'
 const ItemUnique = styled.div`
     background-color: #ffffff;
     color: black;
@@ -37,10 +37,10 @@ const ContainerButtons = styled.div`
     display: flex ;
     flex-direction: row;
 `
-const ButtonDelete = styled.button`
+const ButtonCarrito = styled.button`
     width: 100%;
     /* height: 32px; */
-    background: red;
+    background: green;
     color:black;
     border-radius: 0 0 17px 17px;
     
@@ -106,37 +106,37 @@ const Image = styled.img`
     height: 151px;
     object-fit: contain;
 `
-const ProductCards = (props) => {
-    const deleteProduct = async ( id ) => {
-        ProductService.remove(id)
-      .then((res) => {
-        if (res.status === 200) {
-          console.log("Producto eliminado")
-          window.location.reload();
-        } else Promise.reject();
-      })
-      .catch((err) => {
+const AllBuysCards = (props) => {
+    // const deleteProduct = async ( id ) => {
+    //     ProductServiceClient.remove(id)
+    //   .then((res) => {
+    //     if (res.status === 200) {
+    //       console.log("clientBuys eliminado")
+    //       window.location.reload();
+    //     } else Promise.reject();
+    //   })
+    //   .catch((err) => {
 
-        console.log(err)
-      });
-
-
+    //     console.log(err)
+    //   });
 
 
-        // await axios.delete(`producto/delete?id=${id}`)
-        // .then(( res ) => {
-        //     if(res.data.success){
-        //         toast.success("Eliminacion correcta del producto "+id);
-        //         props.actualizar();
-        //     }
-        //     else{
-        //         toast.error("Error al eliminar el producto");
-        //     }
-        // }).catch(( err ) => {
-        //     // toast.error(err.response.error)
-        // });
-    }
 
+
+    //     // await axios.delete(`producto/delete?id=${id}`)
+    //     // .then(( res ) => {
+    //     //     if(res.data.success){
+    //     //         toast.success("Eliminacion correcta del producto "+id);
+    //     //         props.actualizar();
+    //     //     }
+    //     //     else{
+    //     //         toast.error("Error al eliminar el producto");
+    //     //     }
+    //     // }).catch(( err ) => {
+    //     //     // toast.error(err.response.error)
+    //     // });
+    // }
+     console.log("client buys: "+props)
     return (
     <ItemUnique>
         {/* <ImagesContainer>
@@ -150,43 +150,34 @@ const ProductCards = (props) => {
             }
         </ImagesContainer> */}
         <Label>
-            Nombre: {props?.producto?.name_product}
+            Nombre: {props?.clientBuys?.category}
         </Label>
         <Label>
-            Categoria: $ {props?.producto?.category}
+            Categoria:  {props?.clientBuys?.category}
         </Label>
         
         <Label>
-            Marca: {props?.producto?.mark}
+            Marca: {props?.clientBuys?.mark}
         </Label>
         <Label>
-            Precio: {props?.producto?.price}
+            Precio: ${props?.clientBuys?.price}
         </Label>
         <Label>
-            Descripcion: {props?.producto?.description}
+            Descripcion: {props?.clientBuys?.description}
         </Label>
         <Label>
-            Stock: {props?.producto?.stock}
+            Stock: {props?.clientBuys?.stock}
         </Label>
         <ContainerButtons>
-            <ButtonDelete onClick={(e)=>{
-                e.preventDefault();
-                console.log("producto> "+props.producto.id_product)
-                deleteProduct(props?.producto?.id_product);
-            }}>
-                Eliminar
-            </ButtonDelete>
-            <ButtonModify onClick={(e)=>{
-                e.preventDefault();
-                
-                deleteProduct(props?.producto?.id_product);
-            }}>
-                Modificar
-            </ButtonModify>
+            <ButtonCarrito 
+            >
+                Agregar al carrito
+            </ButtonCarrito>
+            
            
         </ContainerButtons>
     </ItemUnique>
   )
 }
 
-export default ProductCards
+export default AllBuysCards
